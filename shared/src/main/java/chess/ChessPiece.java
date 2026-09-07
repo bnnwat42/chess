@@ -29,12 +29,21 @@ public class ChessPiece {
         if (obj == this){
             return true;
         }
-        //Cannot compare if obj is not a ChessPosition or null
+        //Cannot compare if obj is not a ChessPiece or null
         if (obj == null || obj.getClass() != getClass()){
             return false;
         }
-        ChessPiece objPosition = (ChessPiece) obj;
-        return (color == objPosition.getTeamColor() && type == objPosition.getPieceType());
+        ChessPiece objPiece = (ChessPiece) obj;
+        return (color == objPiece.getTeamColor()
+                && type == objPiece.getPieceType());
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPiece{" +
+                "color=" + color +
+                ", type=" + type +
+                '}';
     }
 
     /**
