@@ -32,9 +32,10 @@ public class ChessPosition {
         return col;
     }
 
+    //This will work as long as the board remains 8 wide and 8 tall
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return row * (col + 8);
     }
 
     @Override
