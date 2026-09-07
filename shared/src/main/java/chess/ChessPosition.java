@@ -8,7 +8,12 @@ package chess;
  */
 public class ChessPosition {
 
+    private int row;
+    private int col;
+
     public ChessPosition(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
 
     /**
@@ -16,7 +21,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        throw new RuntimeException("Not implemented");
+        return row;
     }
 
     /**
@@ -24,7 +29,7 @@ public class ChessPosition {
      * 1 codes for the left column
      */
     public int getColumn() {
-        throw new RuntimeException("Not implemented");
+        return col;
     }
 
     @Override
@@ -34,6 +39,23 @@ public class ChessPosition {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        //The obj is equivalent to itself
+        if (obj == this){
+            return true;
+        }
+        //Cannot compare if obj is not a ChessPosition or null
+        if (obj == null || obj.getClass() != getClass()){
+            return false;
+        }
+        ChessPosition objPosition = (ChessPosition) obj;
+        return (row == objPosition.getRow() && col == objPosition.getColumn());
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition{" +
+                "rank=" + row +
+                ", file=" + col +
+                '}';
     }
 }
