@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Arrays;
+
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 import static chess.ChessPiece.PieceType.*;
@@ -25,7 +27,30 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        //The obj is equivalent to itself
+        if (obj == this){
+            return true;
+        }
+        //Cannot compare if obj is not a ChessPiece or null
+        if (obj == null || obj.getClass() != getClass()){
+            return false;
+        }
+        ChessBoard objBoard = (ChessBoard) obj;
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                if(board[i][j] == null){
+                    if (objBoard.getPiece(new ChessPosition(i+1,j+1)) == null){
+                        continue;
+                    } else {
+                        return false;
+                    }
+                }
+                if(!board[i][j].equals(objBoard.getPiece(new ChessPosition(i+1,j+1)))){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -81,5 +106,21 @@ public class ChessBoard {
             //King
             board[rows[i]][4] = new ChessPiece(colors[i], KING);
         }
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for(ChessPiece[] i : board){
+            for(ChessPiece j : i){
+                if(j == null){
+                    str += "null, ";
+                    continue;
+                }
+                str += j.toString() + ", ";
+            }
+            str += "\n";
+        }
+        return str;
     }
 }
