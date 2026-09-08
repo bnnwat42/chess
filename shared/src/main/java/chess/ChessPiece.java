@@ -10,12 +10,17 @@ import java.util.Collection;
  */
 public class ChessPiece {
 
-    private ChessGame.TeamColor color;
-    private ChessPiece.PieceType type;
+    private final ChessGame.TeamColor color;
+    private final ChessPiece.PieceType type;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.color = pieceColor;
         this.type = type;
+    }
+
+    public ChessPiece(ChessPiece toCopy){
+        this.color = toCopy.getTeamColor();
+        this.type = toCopy.getPieceType();
     }
 
     @Override

@@ -1,5 +1,9 @@
 package chess;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessPiece.PieceType.*;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,8 +12,10 @@ package chess;
  */
 public class ChessBoard {
 
+    private ChessPiece[][] board;
+
     public ChessBoard() {
-        
+        board = new ChessPiece[8][8];
     }
 
     @Override
@@ -29,7 +35,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        board[position.getRow()-1][position.getColumn()-1] = new ChessPiece(piece);
     }
 
     /**
@@ -40,7 +46,11 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece thisPiece = board[position.getRow()-1][position.getColumn()-1];
+        if (thisPiece == null){
+            return null;
+        }
+        return new ChessPiece(thisPiece);
     }
 
     /**
@@ -48,6 +58,28 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        //First Pawns
+        for(int i=0; i<8; i++){
+            board[1][i] = new ChessPiece(WHITE, PAWN);;
+            board[6][i] = new ChessPiece(BLACK, PAWN);
+        }
+        int[] rows = {0, 7};
+        ChessGame.TeamColor[] colors = {WHITE, BLACK};
+        //Loops through the Whites, then the blacks
+        for (int i=0; i<2; i++) {
+            //Rooks
+            board[rows[i]][0] = new ChessPiece(colors[i], ROOK);
+            board[rows[i]][7] = new ChessPiece(colors[i], ROOK);
+            //Knights
+            board[rows[i]][1] = new ChessPiece(colors[i], KNIGHT);
+            board[rows[i]][6] = new ChessPiece(colors[i], KNIGHT);
+            //Bishops
+            board[rows[i]][2] = new ChessPiece(colors[i], BISHOP);
+            board[rows[i]][5] = new ChessPiece(colors[i], BISHOP);
+            //Queen
+            board[rows[i]][3] = new ChessPiece(colors[i], QUEEN);
+            //King
+            board[rows[i]][4] = new ChessPiece(colors[i], KING);
+        }
     }
 }
