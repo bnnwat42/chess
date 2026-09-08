@@ -1,5 +1,6 @@
 package chess;
 
+import javax.xml.namespace.QName;
 import java.util.Collection;
 
 /**
@@ -25,7 +26,7 @@ public class ChessPiece {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return color.hashCode() * type.hashCode();
     }
 
     @Override
@@ -45,10 +46,7 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return "ChessPiece{" +
-                "color=" + color +
-                ", type=" + type +
-                '}';
+        return type.name().substring(0,1) + color.name().substring(0,1);
     }
 
     /**

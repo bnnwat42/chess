@@ -22,7 +22,20 @@ public class ChessBoard {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int i = 1;
+        int j = 0;
+        int hash = 0;
+        for (ChessPiece[] row : board){
+            for (ChessPiece p : row){
+                if (p == null){
+                    continue;
+                }
+                hash += (i * p.hashCode()) + j;
+                i *= 10;
+                j++;
+            }
+        }
+        return hash;
     }
 
     @Override
