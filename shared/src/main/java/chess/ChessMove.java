@@ -45,7 +45,13 @@ public class ChessMove {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        int hashCode = 1;
+        hashCode *= (startPosition.hashCode() * 2) + 1;
+        hashCode *= (endPosition.hashCode() * 3) + 1;
+        if(promotionPiece != null){
+            hashCode *= promotionPiece.ordinal() + 1;
+        }
+        return hashCode;
     }
 
     @Override
@@ -67,9 +73,8 @@ public class ChessMove {
     @Override
     public String toString() {
         return "ChessMove{" +
-                "startPosition=" + startPosition +
-                ", endPosition=" + endPosition +
-                ", promotionPiece=" + promotionPiece +
+                "(" + startPosition + " => " + endPosition +
+                ") promotionPiece=" + promotionPiece +
                 '}';
     }
 }
