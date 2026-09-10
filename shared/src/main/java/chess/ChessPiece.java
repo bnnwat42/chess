@@ -89,12 +89,78 @@ public class ChessPiece {
 
         switch (myPiece.getPieceType()){
             case ROOK: {
+                int[][] directions = {{1,0},{-1,0},{0,-1},{0,1}};
+                ChessPosition tempPosition;
+                ChessPiece targetPiece;
+                for (int[] d : directions){
+                    int counter = 0;
+                    while (true){
+                        counter++;
+                        tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
+                        if(tempPosition.OutofBounds()){
+                            break;
+                        }
+                        targetPiece = board.getPiece(tempPosition);
+                        if (targetPiece == null){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                        } else if (targetPiece.getTeamColor() != myPiece.getTeamColor()){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             case BISHOP: {
+                int[][] directions = {{1,1},{-1,-1},{1,-1},{-1,1}};
+                ChessPosition tempPosition;
+                ChessPiece targetPiece;
+                for (int[] d : directions){
+                    int counter = 0;
+                    while (true){
+                        counter++;
+                        tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
+                        if(tempPosition.OutofBounds()){
+                            break;
+                        }
+                        targetPiece = board.getPiece(tempPosition);
+                        if (targetPiece == null){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                        } else if (targetPiece.getTeamColor() != myPiece.getTeamColor()){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             case QUEEN: {
+                int[][] directions = {{1,0},{-1,0},{0,-1},{0,1},{1,1},{-1,-1},{1,-1},{-1,1}};
+                ChessPosition tempPosition;
+                ChessPiece targetPiece;
+                for (int[] d : directions){
+                    int counter = 0;
+                    while (true){
+                        counter++;
+                        tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
+                        if(tempPosition.OutofBounds()){
+                            break;
+                        }
+                        targetPiece = board.getPiece(tempPosition);
+                        if (targetPiece == null){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                        } else if (targetPiece.getTeamColor() != myPiece.getTeamColor()){
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                }
                 break;
             }
             case KNIGHT: {
