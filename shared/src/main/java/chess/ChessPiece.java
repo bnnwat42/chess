@@ -87,9 +87,18 @@ public class ChessPiece {
         ChessPiece myPiece = board.getPiece(myPosition);
         ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
 
-        switch (myPiece.getPieceType()){
-            case ROOK: {
-                int[][] directions = {{1,0},{-1,0},{0,-1},{0,1}};
+            if(myPiece.getPieceType() == PieceType.ROOK ||
+                    myPiece.getPieceType() == PieceType.BISHOP ||
+                    myPiece.getPieceType() == PieceType.QUEEN){
+                //Queen, rook, and bishop use funcionaly the same code
+                int[][] directions = {};
+                if(myPiece.getPieceType() == PieceType.ROOK) {
+                    directions = new int[][] {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
+                } else if(myPiece.getPieceType() == PieceType.BISHOP) {
+                    directions = new int[][] {{1,1},{-1,-1},{1,-1},{-1,1}};
+                } else if(myPiece.getPieceType() == PieceType.QUEEN) {
+                    directions = new int[][] {{1,0},{-1,0},{0,-1},{0,1},{1,1},{-1,-1},{1,-1},{-1,1}};
+                }
                 ChessPosition tempPosition;
                 ChessPiece targetPiece;
                 for (int[] d : directions){
@@ -111,59 +120,8 @@ public class ChessPiece {
                         }
                     }
                 }
-                break;
             }
-            case BISHOP: {
-                int[][] directions = {{1,1},{-1,-1},{1,-1},{-1,1}};
-                ChessPosition tempPosition;
-                ChessPiece targetPiece;
-                for (int[] d : directions){
-                    int counter = 0;
-                    while (true){
-                        counter++;
-                        tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
-                        if(tempPosition.OutofBounds()){
-                            break;
-                        }
-                        targetPiece = board.getPiece(tempPosition);
-                        if (targetPiece == null){
-                            moves.add(new ChessMove(myPosition, tempPosition, null));
-                        } else if (targetPiece.getTeamColor() != myPiece.getTeamColor()){
-                            moves.add(new ChessMove(myPosition, tempPosition, null));
-                            break;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-            case QUEEN: {
-                int[][] directions = {{1,0},{-1,0},{0,-1},{0,1},{1,1},{-1,-1},{1,-1},{-1,1}};
-                ChessPosition tempPosition;
-                ChessPiece targetPiece;
-                for (int[] d : directions){
-                    int counter = 0;
-                    while (true){
-                        counter++;
-                        tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
-                        if(tempPosition.OutofBounds()){
-                            break;
-                        }
-                        targetPiece = board.getPiece(tempPosition);
-                        if (targetPiece == null){
-                            moves.add(new ChessMove(myPosition, tempPosition, null));
-                        } else if (targetPiece.getTeamColor() != myPiece.getTeamColor()){
-                            moves.add(new ChessMove(myPosition, tempPosition, null));
-                            break;
-                        } else {
-                            break;
-                        }
-                    }
-                }
-                break;
-            }
-            case KNIGHT: {
+            if(myPiece.getPieceType() == PieceType.KNIGHT) {
                 //Its really dumb, but it works
                 int[] shifts = {1, 2, -1, -2, 1, -2, -1, 2, 1};
                 ChessPosition tempPosition;
@@ -178,9 +136,8 @@ public class ChessPiece {
                         moves.add(new ChessMove(myPosition, tempPosition, null));
                     }
                 }
-                break;
             }
-            case KING: {
+            if(myPiece.getPieceType() == PieceType.KING){
                 ChessPosition tempPosition;
                 ChessPiece targetPiece;
                 for (int i = -1; i <= 1; i++) {
@@ -199,9 +156,8 @@ public class ChessPiece {
                         moves.add(new ChessMove(myPosition, tempPosition, null));
                     }
                 }
-                break;
             }
-            case PAWN:{
+            if(myPiece.getPieceType() == PieceType.PAWN){
                 int direction = (myPiece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
                 ChessPosition tempPosition = new ChessPosition(myPosition, direction, 0);
                 ChessPiece targetPiece = board.getPiece(tempPosition);
@@ -239,8 +195,6 @@ public class ChessPiece {
                         }
                     }
                 }
-                }
-                break;
         }
         return moves;
     }

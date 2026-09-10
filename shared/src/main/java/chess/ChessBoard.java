@@ -60,7 +60,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = new ChessPiece(piece);
+        board[position.getRow()-1][position.getColumn()-1] = (piece == null) ? null : new ChessPiece(piece);
     }
 
     /**
