@@ -21,10 +21,6 @@ public class ChessPosition {
         this.col = position.getColumn() + fileIncrement;
     }
 
-    public boolean OutofBounds() {
-        return 9 <= row || row <= 0 || col <= 0 || 9 <= col;
-    }
-
     /**
      * @return which row this position is in
      * 1 codes for the bottom row

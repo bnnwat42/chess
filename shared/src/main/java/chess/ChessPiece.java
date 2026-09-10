@@ -89,24 +89,28 @@ public class ChessPiece {
 
             if(myPiece.getPieceType() == PieceType.ROOK ||
                     myPiece.getPieceType() == PieceType.BISHOP ||
-                    myPiece.getPieceType() == PieceType.QUEEN){
-                //Queen, rook, and bishop use funcionaly the same code
+                    myPiece.getPieceType() == PieceType.QUEEN ||
+                    myPiece.getPieceType() == PieceType.KING){
+                //Queen, rook, king and bishop use functionally the same code
                 int[][] directions = {};
                 if(myPiece.getPieceType() == PieceType.ROOK) {
                     directions = new int[][] {{1, 0}, {-1, 0}, {0, -1}, {0, 1}};
                 } else if(myPiece.getPieceType() == PieceType.BISHOP) {
                     directions = new int[][] {{1,1},{-1,-1},{1,-1},{-1,1}};
-                } else if(myPiece.getPieceType() == PieceType.QUEEN) {
+                }
+                //The king is just a mini queen
+                else if(myPiece.getPieceType() == PieceType.QUEEN || myPiece.getPieceType() == PieceType.KING) {
                     directions = new int[][] {{1,0},{-1,0},{0,-1},{0,1},{1,1},{-1,-1},{1,-1},{-1,1}};
                 }
                 ChessPosition tempPosition;
                 ChessPiece targetPiece;
                 for (int[] d : directions){
                     int counter = 0;
-                    while (true){
+                    //If the piece is king it only needs to search one deep
+                    while (myPiece.getPieceType() != PieceType.KING || counter < 1){
                         counter++;
                         tempPosition = new ChessPosition(myPosition, d[0]*counter, d[1]*counter);
-                        if(tempPosition.OutofBounds()){
+                        if(OutofBounds(tempPosition)){
                             break;
                         }
                         targetPiece = board.getPiece(tempPosition);
@@ -128,7 +132,7 @@ public class ChessPiece {
                 ChessPiece targetPiece;
                 for (int i = 0; i < shifts.length-1; i++) {
                     tempPosition = new ChessPosition(myPosition, shifts[i], shifts[i + 1]);
-                    if (tempPosition.OutofBounds()){
+                    if (OutofBounds(tempPosition)){
                         continue;
                     }
                     targetPiece = board.getPiece(tempPosition);
@@ -137,7 +141,7 @@ public class ChessPiece {
                     }
                 }
             }
-            if(myPiece.getPieceType() == PieceType.KING){
+            /*if(myPiece.getPieceType() == PieceType.KING){
                 ChessPosition tempPosition;
                 ChessPiece targetPiece;
                 for (int i = -1; i <= 1; i++) {
@@ -146,7 +150,7 @@ public class ChessPiece {
                             continue;
                         }
                         tempPosition = new ChessPosition(myPosition, i, j);
-                        if (tempPosition.OutofBounds()) {
+                        if (OutofBounds(tempPosition)) {
                             continue;
                         }
                         targetPiece = board.getPiece(tempPosition);
@@ -156,7 +160,7 @@ public class ChessPiece {
                         moves.add(new ChessMove(myPosition, tempPosition, null));
                     }
                 }
-            }
+            }*/
             if(myPiece.getPieceType() == PieceType.PAWN){
                 int direction = (myPiece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
                 ChessPosition tempPosition = new ChessPosition(myPosition, direction, 0);
@@ -182,7 +186,7 @@ public class ChessPiece {
                 int[] sides = {-1,1};
                 for(int i : sides){
                     tempPosition = new ChessPosition(myPosition, direction, i);
-                    if(tempPosition.OutofBounds()){
+                    if(OutofBounds(tempPosition)){
                         continue;
                     }
                     targetPiece = board.getPiece(tempPosition);
@@ -207,5 +211,12 @@ public class ChessPiece {
             moves.add(new ChessMove(startPosition, endPosition, p));
         }
         return moves;
+    }
+
+    //Checks if position is out of bounds
+    private boolean OutofBounds(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        return 9 <= row || row <= 0 || col <= 0 || 9 <= col;
     }
 }
