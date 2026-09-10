@@ -102,20 +102,65 @@ public class ChessPiece {
                         if(i==0 && j==0){
                             continue;
                         }
-                        ChessPosition tempPositon = new ChessPosition(myPosition, i, j);
-                        if(tempPositon.OutofBounds()){
+                        ChessPosition tempPosition = new ChessPosition(myPosition, i, j);
+                        if(tempPosition.OutofBounds()){
                             continue;
                         }
-                        ChessPiece tempPiece = board.getPiece(tempPositon);
+                        ChessPiece tempPiece = board.getPiece(tempPosition);
                         if (tempPiece != null && tempPiece.getTeamColor() == myPiece.getTeamColor()){
                             continue;
                         }
-                        moves.add(new ChessMove(myPosition, tempPositon, null));
+                        moves.add(new ChessMove(myPosition, tempPosition, null));
                     }
                 }
                 break;
             case PAWN:
+                int direction = (myPiece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 1 : -1;
+                ChessPosition tempPosition = new ChessPosition(myPosition, direction, 0);
+                ChessPiece targetPiece = board.getPiece(tempPosition);
+                //Checks if square directly in front of pawn is empty
+                if (targetPiece == null) {
+                    if(tempPosition.getRow() == 1 || tempPosition.getRow() == 8){
+                        moves.addAll(makePromotionMoves(myPosition,tempPosition));
+                    } else {
+                        moves.add(new ChessMove(myPosition, tempPosition, null));
+                    }
+                //If on starting square, checks if 2 in front is empty as well
+                    if (myPosition.getRow() == ((direction == 1) ? 2 : 7)){
+                        tempPosition = new ChessPosition(myPosition, direction*2, 0);
+                        targetPiece = board.getPiece(tempPosition);
+                        if (targetPiece == null) {
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                        }
+                    }
+                }
+                //Checks if there is an enemy piece to take diagonally
+                int[] sides = {-1,1};
+                for(int i : sides){
+                    tempPosition = new ChessPosition(myPosition, direction, i);
+                    if(tempPosition.OutofBounds()){
+                        continue;
+                    }
+                    targetPiece = board.getPiece(tempPosition);
+                    if (targetPiece != null && board.getPiece(tempPosition).getTeamColor() != myPiece.getTeamColor()){
+                        if(tempPosition.getRow() == 1 || tempPosition.getRow() == 8){
+                            moves.addAll(makePromotionMoves(myPosition,tempPosition));
+                        } else {
+                            moves.add(new ChessMove(myPosition, tempPosition, null));
+                        }
+                    }
+                }
                 break;
+        }
+        return moves;
+    }
+
+    /**@return All promotion pieces of a pawn*/
+    private Collection<ChessMove> makePromotionMoves(ChessPosition startPosition, ChessPosition endPosition){
+        ChessPiece.PieceType[] pieces = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
+        ArrayList<ChessMove> moves = new ArrayList<ChessMove>();
+        for(ChessPiece.PieceType p : pieces){
+            moves.add(new ChessMove(startPosition, endPosition, p));
         }
         return moves;
     }
