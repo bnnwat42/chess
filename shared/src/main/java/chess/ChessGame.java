@@ -88,23 +88,7 @@ public class ChessGame {
         //We go through each piece and pretend the king is one of them. If it can take an enemy piece
         //of the corresponding piece, we know the corresponding piece can also take it
         ChessBoard testBoard = new ChessBoard(myBoard);
-        ChessPosition kingPosition = myBoard.getKingPosition(teamColor);
-
-        for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
-            if(p == KING){
-                continue;
-            }
-            ChessPiece holderPiece = new ChessPiece(teamColor, p);
-            testBoard.addPiece(kingPosition, holderPiece);
-            Collection<ChessMove> moves = holderPiece.pieceMoves(testBoard, kingPosition);
-            for (ChessMove m : moves) {
-                //If the pieceType of one of the moves is the same as the check typed, it can take king
-                if (testBoard.getPiece(m.getEndPosition()) != null && testBoard.getPiece(m.getEndPosition()).getPieceType() == p) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return testBoard.isInCheck(teamColor);
     }
 
     /**
@@ -125,7 +109,24 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //Check if all possible king positions
+        if(isInCheck(teamColor)){
+            return false;
+        }
+        ChessPosition kingPos = myBoard.getKingPosition(teamColor);
+        ChessPiece kingPiece = myBoard.getPiece(kingPos);
+
+        for (ChessMove m : kingPiece.pieceMoves(myBoard, kingPos)){
+            ChessBoard testBoard = new ChessBoard(myBoard);
+            testBoard.addPiece(m.getEndPosition(), kingPiece);
+            testBoard.addPiece(m.getStartPosition(), null);
+            if(!testBoard.isInCheck(teamColor)){
+                return false;
+            }
+        }
+        //Check if other moves would stop it
+
+        return true;
     }
 
     /**

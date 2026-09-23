@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.Collection;
+
 import static chess.ChessPiece.PieceType.*;
 import static chess.ChessGame.TeamColor.*;
 
@@ -13,8 +15,8 @@ import static chess.ChessGame.TeamColor.*;
 public class ChessBoard {
 
     private ChessPiece[][] board;
-    private ChessPosition whiteKing;
-    private ChessPosition blackKing;
+    private ChessPosition whiteKingPos;
+    private ChessPosition blackKingPos;
 
     @Override
     public int hashCode() {
@@ -70,9 +72,9 @@ public class ChessBoard {
                 board[i][j] = toCopy.getPiece(new ChessPosition(i+1, j+1));
                 if(board[i][j] != null && board[i][j].getPieceType() == KING){
                     if(board[i][j].getTeamColor() == WHITE){
-                        whiteKing = new ChessPosition(i+1, j+1);
+                        whiteKingPos = new ChessPosition(i+1, j+1);
                     } else if(board[i][j].getTeamColor() == BLACK){
-                        blackKing = new ChessPosition(i+1, j+1);
+                        blackKingPos = new ChessPosition(i+1, j+1);
                     }
                 }
             }
@@ -81,9 +83,9 @@ public class ChessBoard {
 
     public ChessPosition getKingPosition(ChessGame.TeamColor color){
         if(color == WHITE){
-            return whiteKing;
+            return whiteKingPos;
         } if(color == BLACK){
-            return blackKing;
+            return blackKingPos;
         } else {
             return null;
         }
@@ -96,11 +98,11 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if (piece.getPieceType() == KING){
+        if (piece != null && piece.getPieceType() == KING){
             if(piece.getTeamColor() == WHITE){
-                whiteKing = position;
+                whiteKingPos = position;
             } else if(piece.getTeamColor() == BLACK){
-                blackKing = position;
+                blackKingPos = position;
             }
         }
         board[position.getRow()-1][position.getColumn()-1] = piece;
@@ -123,8 +125,8 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
-        whiteKing = new ChessPosition(1,5);
-        blackKing = new ChessPosition(8,5);
+        whiteKingPos = new ChessPosition(1,5);
+        blackKingPos = new ChessPosition(8,5);
         for(ChessGame.TeamColor color : new ChessGame.TeamColor[] {WHITE, BLACK}){
             //Pawns
             int side = (color == WHITE) ? 1 : 6;
@@ -145,5 +147,27 @@ public class ChessBoard {
             board[side][3] = new ChessPiece(color, QUEEN);
             board[side][4] = new ChessPiece(color, KING);
         }
+    }
+
+    public boolean isInCheck(ChessGame.TeamColor teamColor) {
+        //We go through each piece and pretend the king is one of them. If it can take an enemy piece
+        //of the corresponding piece, we know the corresponding piece can also take it
+        ChessPosition kingPosition = this.getKingPosition(teamColor);
+
+        for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
+            if(p == KING){
+                continue;
+            }
+            ChessPiece holderPiece = new ChessPiece(teamColor, p);
+            this.addPiece(kingPosition, holderPiece);
+            Collection<ChessMove> moves = holderPiece.pieceMoves(this, kingPosition);
+            for (ChessMove m : moves) {
+                //If the pieceType of one of the moves is the same as the check typed, it can take king
+                if (this.getPiece(m.getEndPosition()) != null && this.getPiece(m.getEndPosition()).getPieceType() == p) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
