@@ -1,10 +1,8 @@
 package chess;
 
 import java.util.Arrays;
-
-import static chess.ChessGame.TeamColor.BLACK;
-import static chess.ChessGame.TeamColor.WHITE;
 import static chess.ChessPiece.PieceType.*;
+import static chess.ChessGame.TeamColor.*;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -16,10 +14,6 @@ public class ChessBoard {
 
     private ChessPiece[][] board;
 
-    public ChessBoard() {
-        board = new ChessPiece[8][8];
-    }
-
     @Override
     public int hashCode() {
         return Arrays.deepHashCode(board);
@@ -27,30 +21,33 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object obj) {
-        //The obj is equivalent to itself
-        if (obj == this){
+        if(this == obj){
             return true;
-        }
-        //Cannot compare if obj is not a ChessPiece or null
-        if (obj == null || obj.getClass() != getClass()){
-            return false;
-        }
-        ChessBoard objBoard = (ChessBoard) obj;
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                if(board[i][j] == null){
-                    if (objBoard.getPiece(new ChessPosition(i+1,j+1)) == null){
-                        continue;
-                    } else {
+        } else if(obj instanceof ChessBoard objBoard){
+            for(int i=0; i<8; i++){
+                for(int j=0; j<8; j++){
+                    ChessPiece toCompare = objBoard.getPiece(new ChessPosition(i+1,j+1));
+                    if(board[i][j] == null || toCompare == null){
+                        if(board[i][j] != toCompare){
+                            return false;
+                        }
+                    } else if(!(board[i][j].equals(toCompare))){
                         return false;
                     }
                 }
-                if(!board[i][j].equals(objBoard.getPiece(new ChessPosition(i+1,j+1)))){
-                    return false;
-                }
             }
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    public ChessBoard() {
+        board = new ChessPiece[8][8];
     }
 
     /**
@@ -60,7 +57,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = (piece == null) ? null : new ChessPiece(piece);
+        board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -71,11 +68,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        ChessPiece thisPiece = board[position.getRow()-1][position.getColumn()-1];
-        if (thisPiece == null){
-            return null;
-        }
-        return new ChessPiece(thisPiece);
+        return board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -83,44 +76,26 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        //First Pawns
-        for(int i=0; i<8; i++){
-            board[1][i] = new ChessPiece(WHITE, PAWN);;
-            board[6][i] = new ChessPiece(BLACK, PAWN);
-        }
-        int[] rows = {0, 7};
-        ChessGame.TeamColor[] colors = {WHITE, BLACK};
-        //Loops through the Whites, then the blacks
-        for (int i=0; i<2; i++) {
-            //Rooks
-            board[rows[i]][0] = new ChessPiece(colors[i], ROOK);
-            board[rows[i]][7] = new ChessPiece(colors[i], ROOK);
-            //Knights
-            board[rows[i]][1] = new ChessPiece(colors[i], KNIGHT);
-            board[rows[i]][6] = new ChessPiece(colors[i], KNIGHT);
-            //Bishops
-            board[rows[i]][2] = new ChessPiece(colors[i], BISHOP);
-            board[rows[i]][5] = new ChessPiece(colors[i], BISHOP);
-            //Queen
-            board[rows[i]][3] = new ChessPiece(colors[i], QUEEN);
-            //King
-            board[rows[i]][4] = new ChessPiece(colors[i], KING);
-        }
-    }
-
-    @Override
-    public String toString() {
-        String str = "";
-        for(ChessPiece[] i : board){
-            for(ChessPiece j : i){
-                if(j == null){
-                    str += "null, ";
-                    continue;
-                }
-                str += j.toString() + ", ";
+        board = new ChessPiece[8][8];
+        for(ChessGame.TeamColor color : new ChessGame.TeamColor[] {WHITE, BLACK}){
+            //Pawns
+            int side = (color == WHITE) ? 1 : 6;
+            for(int i=0; i<8; i++){
+                board[side][i] = new ChessPiece(color, PAWN);
             }
-            str += "\n";
+            side = (color == WHITE) ? 0 : 7;
+            //Rooks
+            board[side][0] = new ChessPiece(color, ROOK);
+            board[side][7] = new ChessPiece(color, ROOK);
+            //Knights
+            board[side][1] = new ChessPiece(color, KNIGHT);
+            board[side][6] = new ChessPiece(color, KNIGHT);
+            //Bishops
+            board[side][2] = new ChessPiece(color, BISHOP);
+            board[side][5] = new ChessPiece(color, BISHOP);
+            //Queen and King
+            board[side][3] = new ChessPiece(color, QUEEN);
+            board[side][4] = new ChessPiece(color, KING);
         }
-        return str;
     }
 }

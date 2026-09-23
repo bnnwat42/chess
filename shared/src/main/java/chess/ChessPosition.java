@@ -57,6 +57,10 @@ public class ChessPosition {
         return (row == objPosition.getRow() && col == objPosition.getColumn());
     }
 
+    public boolean outOfBounds() {
+        return row <= 0 || row > 8 || col <= 0 || col > 8;
+    }
+
     @Override
     public String toString() {
         return "(" + row + ", " + col + ")";

@@ -49,7 +49,7 @@ public class ChessMove {
         hashCode *= (startPosition.hashCode() * 2) + 1;
         hashCode *= (endPosition.hashCode() * 3) + 1;
         if(promotionPiece != null){
-            hashCode *= promotionPiece.ordinal() + 1;
+            hashCode *= promotionPiece.hashCode() + 1;
         }
         return hashCode;
     }
