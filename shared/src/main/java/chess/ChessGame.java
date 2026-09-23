@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import static chess.ChessPiece.PieceType.*;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -12,12 +14,20 @@ public class ChessGame {
 
     private static ChessBoard myBoard;
     private TeamColor teamTurn;
-    private ChessPosition whiteKing;
-    private ChessPosition blackKing;
 
     public ChessGame() {
         ChessBoard myBoard = new ChessBoard();
         teamTurn = TeamColor.WHITE;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 
     /**
@@ -52,6 +62,9 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        if(myBoard.getPiece(startPosition) == null){
+            return null;
+        }
         throw new RuntimeException("Not implemented");
     }
 
@@ -72,7 +85,26 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        //We go through each piece and pretend the king is one of them. If it can take an enemy piece
+        //of the corresponding piece, we know the corresponding piece can also take it
+        ChessBoard testBoard = new ChessBoard(myBoard);
+        ChessPosition kingPosition = myBoard.getKingPosition(teamColor);
+
+        for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
+            if(p == KING){
+                continue;
+            }
+            ChessPiece holderPiece = new ChessPiece(teamColor, p);
+            testBoard.addPiece(kingPosition, holderPiece);
+            Collection<ChessMove> moves = holderPiece.pieceMoves(testBoard, kingPosition);
+            for (ChessMove m : moves) {
+                //If the pieceType of one of the moves is the same as the check typed, it can take king
+                if (testBoard.getPiece(m.getEndPosition()) != null && testBoard.getPiece(m.getEndPosition()).getPieceType() == p) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -82,7 +114,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return this.isInStalemate(teamColor) && this.isInCheck(teamColor);
     }
 
     /**
@@ -102,7 +134,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        myBoard = new ChessBoard(board);
     }
 
     /**

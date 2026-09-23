@@ -3,6 +3,7 @@ package chess;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 
 /**
@@ -43,7 +44,16 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return super.toString();
+        var name = "";
+        if(type == PieceType.KNIGHT){
+            name += "N";
+        } else {
+            name += type.toString().charAt(0);
+        }
+        if(pieceColor == ChessGame.TeamColor.BLACK){
+            name = name.toLowerCase();
+        }
+        return name;
     }
 
     /**
@@ -139,7 +149,7 @@ public class ChessPiece {
         ChessPosition testPos;
         //Check in front
         testPos = new ChessPosition(myPosition, dir, 0);
-        if(board.getPiece(testPos) == null){
+        if(!testPos.outOfBounds() && board.getPiece(testPos) == null){
             pawnList.addAll(toPromoteOrNotToPromote(myPosition, testPos));
             if(myPosition.getRow() == ((dir == 1) ? 2 : 7)) {
                 testPos = new ChessPosition(myPosition, dir * 2, 0);

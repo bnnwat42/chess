@@ -13,6 +13,8 @@ import static chess.ChessGame.TeamColor.*;
 public class ChessBoard {
 
     private ChessPiece[][] board;
+    private ChessPosition whiteKing;
+    private ChessPosition blackKing;
 
     @Override
     public int hashCode() {
@@ -43,11 +45,48 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return super.toString();
+        var name = "|";
+        for(ChessPiece[] c: board){
+            for(ChessPiece p : c){
+                if(p == null){
+                    name += " |";
+                } else {
+                    name += p.toString() + "|";
+                }
+            }
+            name += "\n|";
+        }
+        return name;
     }
 
     public ChessBoard() {
         board = new ChessPiece[8][8];
+    }
+
+    public ChessBoard(ChessBoard toCopy){
+        board = new ChessPiece[8][8];
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                board[i][j] = toCopy.getPiece(new ChessPosition(i+1, j+1));
+                if(board[i][j] != null && board[i][j].getPieceType() == KING){
+                    if(board[i][j].getTeamColor() == WHITE){
+                        whiteKing = new ChessPosition(i+1, j+1);
+                    } else if(board[i][j].getTeamColor() == BLACK){
+                        blackKing = new ChessPosition(i+1, j+1);
+                    }
+                }
+            }
+        }
+    }
+
+    public ChessPosition getKingPosition(ChessGame.TeamColor color){
+        if(color == WHITE){
+            return whiteKing;
+        } if(color == BLACK){
+            return blackKing;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -57,6 +96,13 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
+        if (piece.getPieceType() == KING){
+            if(piece.getTeamColor() == WHITE){
+                whiteKing = position;
+            } else if(piece.getTeamColor() == BLACK){
+                blackKing = position;
+            }
+        }
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
@@ -77,6 +123,8 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
+        whiteKing = new ChessPosition(1,5);
+        blackKing = new ChessPosition(8,5);
         for(ChessGame.TeamColor color : new ChessGame.TeamColor[] {WHITE, BLACK}){
             //Pawns
             int side = (color == WHITE) ? 1 : 6;
