@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -17,6 +18,9 @@ public class ChessBoard {
     private ChessPiece[][] board;
     private ChessPosition whiteKingPos;
     private ChessPosition blackKingPos;
+    private Collection<ChessPosition> whitePieces;
+    private Collection<ChessPosition> blackPieces;
+
 
     @Override
     public int hashCode() {
@@ -63,25 +67,37 @@ public class ChessBoard {
 
     public ChessBoard() {
         board = new ChessPiece[8][8];
+        whitePieces = new ArrayList<>();
+        blackPieces = new ArrayList<>();
     }
 
     public ChessBoard(ChessBoard toCopy){
         board = new ChessPiece[8][8];
+        whitePieces = new ArrayList<>();
+        blackPieces = new ArrayList<>();
+
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++){
                 board[i][j] = toCopy.getPiece(new ChessPosition(i+1, j+1));
-                if(board[i][j] != null && board[i][j].getPieceType() == KING){
+                //Makes a list of all positions of each piece of each color
+                if(board[i][j] != null){
                     if(board[i][j].getTeamColor() == WHITE){
-                        whiteKingPos = new ChessPosition(i+1, j+1);
+                        whitePieces.add(new ChessPosition(i+1, j+1));
+                        if(board[i][j].getPieceType() == KING){
+                            whiteKingPos = new ChessPosition(i+1, j+1);
+                        }
                     } else if(board[i][j].getTeamColor() == BLACK){
-                        blackKingPos = new ChessPosition(i+1, j+1);
+                        blackPieces.add(new ChessPosition(i+1, j+1));
+                        if(board[i][j].getPieceType() == KING){
+                            blackKingPos = new ChessPosition(i+1, j+1);
+                        }
                     }
                 }
             }
         }
     }
 
-    public ChessPosition getKingPosition(ChessGame.TeamColor color){
+    private ChessPosition getKingPosition(ChessGame.TeamColor color){
         if(color == WHITE){
             return whiteKingPos;
         } if(color == BLACK){
@@ -150,8 +166,9 @@ public class ChessBoard {
     }
 
     public boolean isInCheck(ChessGame.TeamColor teamColor) {
-        //We go through each piece and pretend the king is one of them. If it can take an enemy piece
-        //of the corresponding piece, we know the corresponding piece can also take it
+        //We go through each piece and pretend the king is that piece. If it can take an enemy piece
+        //of the corresponding type, we know the corresponding piece can also take it
+        ChessBoard testBoard = new ChessBoard(this);
         ChessPosition kingPosition = this.getKingPosition(teamColor);
 
         for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
@@ -159,15 +176,50 @@ public class ChessBoard {
                 continue;
             }
             ChessPiece holderPiece = new ChessPiece(teamColor, p);
-            this.addPiece(kingPosition, holderPiece);
-            Collection<ChessMove> moves = holderPiece.pieceMoves(this, kingPosition);
+            testBoard.addPiece(kingPosition, holderPiece);
+            Collection<ChessMove> moves = holderPiece.pieceMoves(testBoard, kingPosition);
             for (ChessMove m : moves) {
                 //If the pieceType of one of the moves is the same as the check typed, it can take king
-                if (this.getPiece(m.getEndPosition()) != null && this.getPiece(m.getEndPosition()).getPieceType() == p) {
+                if (testBoard.getPiece(m.getEndPosition()) != null && testBoard.getPiece(m.getEndPosition()).getPieceType() == p) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    //Used by the checkmate and stalemate methods
+    private boolean isSurrounded(ChessGame.TeamColor teamColor) {
+        //All positions of pieces of select color
+        Collection<ChessPosition> piecePositions = (teamColor == WHITE) ? whitePieces : blackPieces;
+
+        //For each position that has a piece of that color
+        for(ChessPosition testPosition : piecePositions) {
+            //Get the piece
+            ChessPiece testPiece = this.getPiece(testPosition);
+            //For each possible move that piece could make
+            for (ChessMove m : testPiece.pieceMoves(this, testPosition)) {
+                //Create a testBoard where that move is done
+                ChessBoard testBoard = new ChessBoard(this);
+                testBoard.addPiece(m.getEndPosition(), testPiece);
+                testBoard.addPiece(m.getStartPosition(), null);
+                //Check if in check. If it isn't, there is a valid move out of stalemate
+                if (!testBoard.isInCheck(teamColor)) {
+                    return false;
+                }
+            }
+        }
+        //If there weren't any valid moves out, it is in stalemate
+        return true;
+    }
+
+    public boolean isInCheckmate(ChessGame.TeamColor teamColor) {
+        //If it has no valid escapes and is in check, it is checkmated
+        return this.isInCheck(teamColor) && this.isSurrounded(teamColor);
+    }
+
+    public boolean isInStalemate(ChessGame.TeamColor teamColor) {
+        //If it has no valid escapes and isn't in check, it is stalemated
+        return !this.isInCheck(teamColor) && this.isSurrounded(teamColor);
     }
 }

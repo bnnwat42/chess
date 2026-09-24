@@ -87,8 +87,7 @@ public class ChessGame {
     public boolean isInCheck(TeamColor teamColor) {
         //We go through each piece and pretend the king is one of them. If it can take an enemy piece
         //of the corresponding piece, we know the corresponding piece can also take it
-        ChessBoard testBoard = new ChessBoard(myBoard);
-        return testBoard.isInCheck(teamColor);
+        return myBoard.isInCheck(teamColor);
     }
 
     /**
@@ -98,7 +97,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return this.isInStalemate(teamColor) && this.isInCheck(teamColor);
+        return myBoard.isInCheckmate(teamColor);
     }
 
     /**
@@ -110,23 +109,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //Check if all possible king positions
-        if(isInCheck(teamColor)){
-            return false;
-        }
-        ChessPosition kingPos = myBoard.getKingPosition(teamColor);
-        ChessPiece kingPiece = myBoard.getPiece(kingPos);
-
-        for (ChessMove m : kingPiece.pieceMoves(myBoard, kingPos)){
-            ChessBoard testBoard = new ChessBoard(myBoard);
-            testBoard.addPiece(m.getEndPosition(), kingPiece);
-            testBoard.addPiece(m.getStartPosition(), null);
-            if(!testBoard.isInCheck(teamColor)){
-                return false;
-            }
-        }
-        //Check if other moves would stop it
-
-        return true;
+        return myBoard.isInStalemate(teamColor);
     }
 
     /**
