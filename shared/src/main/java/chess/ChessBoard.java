@@ -16,11 +16,6 @@ import static chess.ChessGame.TeamColor.*;
 public class ChessBoard {
 
     private ChessPiece[][] board;
-    private ChessPosition whiteKingPos;
-    private ChessPosition blackKingPos;
-    private Collection<ChessPosition> whitePieces;
-    private Collection<ChessPosition> blackPieces;
-
 
     @Override
     public int hashCode() {
@@ -67,43 +62,15 @@ public class ChessBoard {
 
     public ChessBoard() {
         board = new ChessPiece[8][8];
-        whitePieces = new ArrayList<>();
-        blackPieces = new ArrayList<>();
     }
 
     public ChessBoard(ChessBoard toCopy){
         board = new ChessPiece[8][8];
-        whitePieces = new ArrayList<>();
-        blackPieces = new ArrayList<>();
 
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++){
                 board[i][j] = toCopy.getPiece(new ChessPosition(i+1, j+1));
-                //Makes a list of all positions of each piece of each color
-                if(board[i][j] != null){
-                    if(board[i][j].getTeamColor() == WHITE){
-                        whitePieces.add(new ChessPosition(i+1, j+1));
-                        if(board[i][j].getPieceType() == KING){
-                            whiteKingPos = new ChessPosition(i+1, j+1);
-                        }
-                    } else if(board[i][j].getTeamColor() == BLACK){
-                        blackPieces.add(new ChessPosition(i+1, j+1));
-                        if(board[i][j].getPieceType() == KING){
-                            blackKingPos = new ChessPosition(i+1, j+1);
-                        }
-                    }
-                }
             }
-        }
-    }
-
-    private ChessPosition getKingPosition(ChessGame.TeamColor color){
-        if(color == WHITE){
-            return whiteKingPos;
-        } if(color == BLACK){
-            return blackKingPos;
-        } else {
-            return null;
         }
     }
 
@@ -114,13 +81,6 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        if (piece != null && piece.getPieceType() == KING){
-            if(piece.getTeamColor() == WHITE){
-                whiteKingPos = position;
-            } else if(piece.getTeamColor() == BLACK){
-                blackKingPos = position;
-            }
-        }
         board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
@@ -135,33 +95,54 @@ public class ChessBoard {
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+    private ArrayList<ChessPosition> getPiecePositions(ChessGame.TeamColor teamColor){
+        ArrayList<ChessPosition> piecePositions = new ArrayList<>();
+        for (int i=0; i<8; i++) {
+            for (int j=0; j < 8; j++) {
+                if(board[i][j] != null && board[i][j].getTeamColor() == teamColor){
+                    piecePositions.add(new ChessPosition(i+1, j+1));
+                }
+            }
+        }
+        return piecePositions;
+    }
+
+    private ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
+        for(ChessPosition c : getPiecePositions(teamColor)){
+            if(this.getPiece(c).getPieceType() == KING){
+                return c;
+            }
+        }
+        //TODO: Throw exception instead of return null
+        return null ;
+    }
+
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
-        whiteKingPos = new ChessPosition(1,5);
-        blackKingPos = new ChessPosition(8,5);
         for(ChessGame.TeamColor color : new ChessGame.TeamColor[] {WHITE, BLACK}){
             //Pawns
-            int side = (color == WHITE) ? 1 : 6;
-            for(int i=0; i<8; i++){
-                board[side][i] = new ChessPiece(color, PAWN);
+            int side = (color == WHITE) ? 2 : 7;
+            for(int i=1; i<=8; i++){
+                this.addPiece(new ChessPosition(side, i), new ChessPiece(color, PAWN));
             }
-            side = (color == WHITE) ? 0 : 7;
+            side = (color == WHITE) ? 1 : 8;
             //Rooks
-            board[side][0] = new ChessPiece(color, ROOK);
-            board[side][7] = new ChessPiece(color, ROOK);
+            this.addPiece(new ChessPosition(side, 1), new ChessPiece(color, ROOK));
+            this.addPiece(new ChessPosition(side, 8), new ChessPiece(color, ROOK));
             //Knights
-            board[side][1] = new ChessPiece(color, KNIGHT);
-            board[side][6] = new ChessPiece(color, KNIGHT);
+            this.addPiece(new ChessPosition(side, 2), new ChessPiece(color, KNIGHT));
+            this.addPiece(new ChessPosition(side, 7), new ChessPiece(color, KNIGHT));
             //Bishops
-            board[side][2] = new ChessPiece(color, BISHOP);
-            board[side][5] = new ChessPiece(color, BISHOP);
+            this.addPiece(new ChessPosition(side, 3), new ChessPiece(color, BISHOP));
+            this.addPiece(new ChessPosition(side, 6), new ChessPiece(color, BISHOP));
             //Queen and King
-            board[side][3] = new ChessPiece(color, QUEEN);
-            board[side][4] = new ChessPiece(color, KING);
+            this.addPiece(new ChessPosition(side, 4), new ChessPiece(color, QUEEN));
+            this.addPiece(new ChessPosition(side, 5), new ChessPiece(color, KING));
         }
     }
 
@@ -172,9 +153,6 @@ public class ChessBoard {
         ChessPosition kingPosition = this.getKingPosition(teamColor);
 
         for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
-            if(p == KING){
-                continue;
-            }
             ChessPiece holderPiece = new ChessPiece(teamColor, p);
             testBoard.addPiece(kingPosition, holderPiece);
             Collection<ChessMove> moves = holderPiece.pieceMoves(testBoard, kingPosition);
@@ -191,7 +169,7 @@ public class ChessBoard {
     //Used by the checkmate and stalemate methods
     private boolean isSurrounded(ChessGame.TeamColor teamColor) {
         //All positions of pieces of select color
-        Collection<ChessPosition> piecePositions = (teamColor == WHITE) ? whitePieces : blackPieces;
+        Collection<ChessPosition> piecePositions = getPiecePositions(teamColor);
 
         //For each position that has a piece of that color
         for(ChessPosition testPosition : piecePositions) {
@@ -209,7 +187,7 @@ public class ChessBoard {
                 }
             }
         }
-        //If there weren't any valid moves out, it is in stalemate
+        //If there weren't any valid moves out, it's surrounded
         return true;
     }
 

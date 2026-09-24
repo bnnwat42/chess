@@ -12,11 +12,12 @@ import static chess.ChessPiece.PieceType.*;
  */
 public class ChessGame {
 
-    private static ChessBoard myBoard;
+    private ChessBoard myBoard;
     private TeamColor teamTurn;
 
     public ChessGame() {
         ChessBoard myBoard = new ChessBoard();
+        myBoard.resetBoard();
         teamTurn = TeamColor.WHITE;
     }
 
