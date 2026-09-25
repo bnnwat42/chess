@@ -23,12 +23,17 @@ public class ChessGame {
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return (myBoard.hashCode()* 31 + 1) * (teamTurn.hashCode() * 71 + 1);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        if(this == obj){
+            return true;
+        } else if(obj instanceof chess.ChessGame objGame){
+            return myBoard.equals(objGame.getBoard()) && teamTurn.equals(objGame.getTeamTurn());
+        }
+        return false;
     }
 
     /**
@@ -66,7 +71,15 @@ public class ChessGame {
         if(myBoard.getPiece(startPosition) == null){
             return null;
         }
-        throw new RuntimeException("Not implemented");
+        ChessPiece myPiece = myBoard.getPiece(startPosition);
+        Collection<ChessMove> potentialMoves = myPiece.pieceMoves(myBoard, startPosition);
+        for (ChessMove move : potentialMoves){
+            ChessBoard testBoard = new ChessBoard(myBoard, move);
+            if(testBoard.isInCheck(myPiece.getTeamColor())){
+                potentialMoves.remove(move);
+            }
+        }
+        return potentialMoves;
     }
 
     /**

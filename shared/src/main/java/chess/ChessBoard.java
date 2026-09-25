@@ -74,6 +74,21 @@ public class ChessBoard {
         }
     }
 
+    public ChessBoard(ChessBoard base, ChessMove move){
+        board = new ChessPiece[8][8];
+        ChessPosition start = move.getStartPosition();
+        ChessPosition end = move.getEndPosition();
+
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++){
+                board[i][j] = base.getPiece(new ChessPosition(i+1, j+1));
+            }
+        }
+        ChessPiece.PieceType newType = (move.getPromotionPiece() == null) ? base.getPiece(start).getPieceType() : move.getPromotionPiece();
+        this.addPiece(end, new ChessPiece(base.getPiece(start).getTeamColor(), newType));
+        this.addPiece(start, null);
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
