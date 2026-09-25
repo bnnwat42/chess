@@ -17,8 +17,8 @@ public class ChessGame {
 
     public ChessGame() {
         myBoard = new ChessBoard();
-        myBoard.resetBoard();
         teamTurn = TeamColor.WHITE;
+        myBoard.resetBoard();
     }
 
     @Override
@@ -73,13 +73,14 @@ public class ChessGame {
         }
         ChessPiece myPiece = myBoard.getPiece(startPosition);
         Collection<ChessMove> potentialMoves = myPiece.pieceMoves(myBoard, startPosition);
+        Collection<ChessMove> realMoves = new ArrayList<>();
         for (ChessMove move : potentialMoves){
             ChessBoard testBoard = new ChessBoard(myBoard, move);
-            if(testBoard.isInCheck(myPiece.getTeamColor())){
-                potentialMoves.remove(move);
+            if(!testBoard.isInCheck(myPiece.getTeamColor())){
+                realMoves.add(move);
             }
         }
-        return potentialMoves;
+        return realMoves;
     }
 
     /**
