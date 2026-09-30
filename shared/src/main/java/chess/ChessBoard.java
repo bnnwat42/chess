@@ -64,6 +64,11 @@ public class ChessBoard {
         board = new ChessPiece[8][8];
     }
 
+    /**
+     * Copy constructor
+     *
+     * @param toCopy The board to copy
+     */
     public ChessBoard(ChessBoard toCopy){
         board = new ChessPiece[8][8];
 
@@ -74,6 +79,12 @@ public class ChessBoard {
         }
     }
 
+    /**
+     * Constructor, makes new board from old board with move implemented
+     *
+     * @param base The original board
+     * @param move The move to do on board
+     */
     public ChessBoard(ChessBoard base, ChessMove move){
         board = new ChessPiece[8][8];
         ChessPosition start = move.getStartPosition();
@@ -110,6 +121,11 @@ public class ChessBoard {
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+    /**
+     * Gets position of all pieces of select color
+     *
+     * @param teamColor the color of pieces to get
+     */
     private ArrayList<ChessPosition> getPiecePositions(ChessGame.TeamColor teamColor){
         ArrayList<ChessPosition> piecePositions = new ArrayList<>();
         for (int i=0; i<8; i++) {
@@ -122,6 +138,11 @@ public class ChessBoard {
         return piecePositions;
     }
 
+    /**
+     * Gets position of king on chessboard
+     *
+     * @param teamColor color of king to get
+     */
     private ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
         for(ChessPosition c : getPiecePositions(teamColor)){
             if(this.getPiece(c).getPieceType() == KING){
@@ -147,8 +168,8 @@ public class ChessBoard {
             }
             side = (color == WHITE) ? 1 : 8;
             //Rooks
-            this.addPiece(new ChessPosition(side, 1), new ChessPiece(color, ROOK));
-            this.addPiece(new ChessPosition(side, 8), new ChessPiece(color, ROOK));
+            this.addPiece(new ChessPosition(side, 1), new ChessPiece(color, ROOK, true));
+            this.addPiece(new ChessPosition(side, 8), new ChessPiece(color, ROOK, true));
             //Knights
             this.addPiece(new ChessPosition(side, 2), new ChessPiece(color, KNIGHT));
             this.addPiece(new ChessPosition(side, 7), new ChessPiece(color, KNIGHT));
@@ -157,9 +178,10 @@ public class ChessBoard {
             this.addPiece(new ChessPosition(side, 6), new ChessPiece(color, BISHOP));
             //Queen and King
             this.addPiece(new ChessPosition(side, 4), new ChessPiece(color, QUEEN));
-            this.addPiece(new ChessPosition(side, 5), new ChessPiece(color, KING));
+            this.addPiece(new ChessPosition(side, 5), new ChessPiece(color, KING, true));
         }
     }
+
 
     public boolean isInCheck(ChessGame.TeamColor teamColor) {
         //We go through each piece and pretend the king is that piece. If it can take an enemy piece

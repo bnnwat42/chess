@@ -1,9 +1,7 @@
 package chess;
 
-import javax.xml.namespace.QName;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Locale;
 
 
 /**
@@ -17,14 +15,24 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final ChessPiece.PieceType type;
 
+    private final boolean canCastle;
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.canCastle = false;
+    }
+
+    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, boolean canCastle) {
+        this.pieceColor = pieceColor;
+        this.type = type;
+        this.canCastle = canCastle;
     }
 
     public ChessPiece(ChessPiece toCopy){
         this.pieceColor = toCopy.getTeamColor();
         this.type = toCopy.getPieceType();
+        canCastle = false;
     }
 
         @Override
@@ -37,7 +45,7 @@ public class ChessPiece {
         if(this == obj){
             return true;
         } else if(obj instanceof chess.ChessPiece objPiece){
-            return objPiece.getPieceType() == type && objPiece.getTeamColor() == pieceColor;
+            return objPiece.getPieceType() == type && objPiece.getTeamColor() == pieceColor; //&& objPiece.canCastle() == canCastle;
         }
         return false;
     }
@@ -54,6 +62,10 @@ public class ChessPiece {
             name = name.toLowerCase();
         }
         return name;
+    }
+
+    public boolean canCastle() {
+        return canCastle;
     }
 
     /**
@@ -113,6 +125,8 @@ public class ChessPiece {
             case KING:
                 directions = new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
                 depth = 1;
+                //Castling
+                //myMoves.addAll(castlingCheck(board, myPosition, myColor));
                 break;
             case KNIGHT:
                 directions = new int[][] {{1,2},{2,1},{-1,2},{2,-1},{-2,1},{1,-2},{-1,-2},{-2,-1}};
@@ -140,6 +154,31 @@ public class ChessPiece {
             }
         }
         return myMoves;
+    }
+
+    private Collection<ChessMove> castlingCheck(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
+        ArrayList<ChessMove> castlingMoves = new ArrayList<>();
+        if(!canCastle || board.isInCheck(myColor)){
+            return castlingMoves;
+        }
+        for(int castlePosition : new int[] {1,8}) {
+            ChessPiece rook = board.getPiece(new ChessPosition(myPosition.getRow(), castlePosition));
+            boolean validCastle = rook.canCastle();
+            if (validCastle) {
+                for (int positionShift : new int[]{1, 2}) {
+                    ChessPosition testPosition = new ChessPosition(myPosition, 0, positionShift);
+                    ChessBoard testBoard = new ChessBoard(board, new ChessMove(myPosition, testPosition, null));
+                    if (testBoard.isInCheck(myColor)) {
+                        validCastle = false;
+                        break;
+                    }
+                }
+                if(validCastle){
+                    //TODO make a castling chessmove
+                }
+            }
+        }
+        return castlingMoves;
     }
 
     private Collection<ChessMove> pawnsAreSpecial(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
