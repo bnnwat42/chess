@@ -22,7 +22,7 @@ public class Server {
     }
 
     private void registerUser(Context context) {
-        Handler.registerUser(context.body());
+        //Handler.registerUser(context.body());
     }
 
     private void clearDatabase(Context ctx) {//throws ResponseException {

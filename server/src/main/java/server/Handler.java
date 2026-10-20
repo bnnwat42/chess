@@ -18,7 +18,9 @@ public class Handler {
     public String registerUser(Context ctx) {
         Map body = this.getBodyObject(ctx, Map.class);
 
+        //TODO
         UserData newUserData = new UserData((String) body.get("username"), (String) body.get("password"), (String) body.get("email"));
+        return null;
     }
 
     private static <T> T getBodyObject(Context context, Class<T> clazz) {

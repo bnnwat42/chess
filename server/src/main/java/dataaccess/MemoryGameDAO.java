@@ -1,0 +1,34 @@
+package dataaccess;
+
+import model.GameData;
+
+import java.util.Collection;
+import java.util.HashMap;
+
+public class MemoryGameDAO implements GameDAO {
+
+    final private HashMap<Integer, GameData> gameStorage = new HashMap<>();
+
+    @Override
+    public void createGame(GameData gameData) {
+        gameStorage.put(gameData.gameID(), gameData);
+    }
+
+    @Override
+    public Object getGame(int gameId) {
+        return gameStorage.get(gameId);
+    }
+
+    @Override
+    public Collection<GameData> listGames() {
+        return gameStorage.values();
+    }
+
+    @Override
+    public void updateGame(GameData gameData) throws DataAccessException {
+        if (gameStorage.get(gameData.gameID()) == null) {
+            throw (new DataAccessException("No game associated with this ID"));
+        }
+        gameStorage.put(gameData.gameID(), gameData);
+    }
+}

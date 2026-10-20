@@ -1,13 +1,15 @@
 package dataaccess;
 
+import model.GameData;
+
 import java.util.Collection;
 
 public interface GameDAO {
-    void createGame(Object gameData);
+    void createGame(GameData gameData);
 
-    Object getGame(Object gameIdentifier);
+    Object getGame(int gameIdentifier);
 
-    Collection<Object> listGames();
+    Collection<GameData> listGames();
 
-    void updateGame(Object gameData);
+    void updateGame(GameData gameData) throws DataAccessException;
 }
