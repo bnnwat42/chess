@@ -7,12 +7,12 @@ import model.*;
 
 import java.util.UUID;
 
-public class UserService {
+public class LoginService {
 
     private final UserDAO userAccess;
     private final AuthDAO authAccess;
 
-    public UserService(UserDAO userAccess, AuthDAO authAccess) {
+    public LoginService(UserDAO userAccess, AuthDAO authAccess) {
         this.userAccess = userAccess;
         this.authAccess = authAccess;
     }

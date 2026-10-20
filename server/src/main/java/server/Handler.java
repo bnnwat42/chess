@@ -3,13 +3,13 @@ package server;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import model.UserData;
-import service.UserService;
+import service.LoginService;
 
 import java.util.Map;
 
 public class Handler {
 
-    UserService userService;
+    LoginService userService;
 
     public Handler() {
 //        userService = new UserService()
