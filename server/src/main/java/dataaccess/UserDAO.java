@@ -4,7 +4,9 @@ import model.UserData;
 
 public interface UserDAO {
 
-    void createUser(UserData userInfo);
+    void createUser(UserData userInfo) throws AlreadyTakenException;
 
-    Object getUser(String userName);
+    UserData getUser(String userName);
+
+    void clear();
 }

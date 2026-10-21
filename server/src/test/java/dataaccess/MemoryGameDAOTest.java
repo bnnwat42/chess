@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -9,6 +10,11 @@ import java.util.HashSet;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryGameDAOTest {
+
+    @BeforeEach
+    void setUp() {
+        MemoryGameDAO.clear();
+    }
 
     @Test
     void createGameAndGetGame() {
@@ -55,7 +61,7 @@ class MemoryGameDAOTest {
 
         assertNotEquals(updatedGame, memoryStorage.getGame(123));
 
-        assertDoesNotThrow(() -> memoryStorage.updateGame(updatedGame));
+        memoryStorage.updateGame(updatedGame);
 
         assertNotEquals(newGame, memoryStorage.getGame(123));
         assertEquals(updatedGame, memoryStorage.getGame(123));

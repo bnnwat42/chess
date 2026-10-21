@@ -2,11 +2,17 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryAuthDAOTest {
+
+    @BeforeEach
+    void setUp() {
+        MemoryAuthDAO.clear();
+    }
 
     @Test
     void createAuthAndGetAuth() {
@@ -31,7 +37,7 @@ class MemoryAuthDAOTest {
         MemoryAuthDAO memoryStorage = new MemoryAuthDAO();
         AuthData newAuth = new AuthData(authToken, username);
         memoryStorage.createAuth(newAuth);
-        
+
         memoryStorage.deleteAuth(authToken);
 
         assertNull(memoryStorage.getAuth(authToken));

@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
 
-    final private HashMap<Integer, GameData> gameStorage = new HashMap<>();
+    static final private HashMap<Integer, GameData> gameStorage = new HashMap<>();
 
     @Override
     public void createGame(GameData gameData) {
@@ -25,10 +25,11 @@ public class MemoryGameDAO implements GameDAO {
     }
 
     @Override
-    public void updateGame(GameData gameData) throws DataAccessException {
-        if (gameStorage.get(gameData.gameID()) == null) {
-            throw (new DataAccessException("No game associated with this ID"));
-        }
+    public void updateGame(GameData gameData) {
         gameStorage.put(gameData.gameID(), gameData);
+    }
+
+    public static void clear() {
+        gameStorage.clear();
     }
 }
