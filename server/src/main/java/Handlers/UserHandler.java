@@ -2,14 +2,13 @@ package Handlers;
 
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
+import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import model.AuthData;
 import model.UserData;
 import service.UserService;
 
-import java.nio.charset.MalformedInputException;
-import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,20 +20,18 @@ public class UserHandler {
         userService = new UserService();
     }
 
-    public AuthData registerUser(Context ctx) throws AlreadyTakenException, InputMismatchException {
+    public String registerUser(Context ctx) throws AlreadyTakenException, BadRequestException {
         Map<String, String> body = getBodyObject(ctx, Map.class);
 
         Set<String> keys = body.keySet();
-        if (!keys.contains("username") ||
-                !keys.contains("password") ||
-                !keys.contains("email") ||
-                keys.size() != 3) {
-            throw new InputMismatchException();
+        if (isMalformed(keys, new String[]{"username", "password", "email"})) {
+            throw new BadRequestException();
         }
 
         UserData newUser = new UserData(body.get("username"), body.get("password"), body.get("email"));
 
-        return userService.register(newUser);
+        AuthData newAuth = userService.register(newUser);
+        return new Gson().toJson(Map.of("username", newAuth.username(), "authToken", newAuth.authToken()));
     }
 
     public void clear() throws Exception {
@@ -51,17 +48,32 @@ public class UserHandler {
         return bodyObject;
     }
 
-    public AuthData loginUser(Context ctx) throws DataAccessException {
+    public String loginUser(Context ctx) throws DataAccessException {
         Map<String, String> body = getBodyObject(ctx, Map.class);
 
         Set<String> keys = body.keySet();
-        if (!keys.contains("username") ||
-                !keys.contains("password") ||
-                keys.size() != 2) {
-            throw new InputMismatchException();
+        if (isMalformed(keys, new String[]{"username", "password"})) {
+            throw new BadRequestException();
         }
 
         UserData loginUser = new UserData(body.get("username"), body.get("password"), null);
-        return userService.login(loginUser);
+        AuthData newAuth = userService.login(loginUser);
+        return new Gson().toJson(Map.of("username", newAuth.username(), "authToken", newAuth.authToken()));
+    }
+
+    public void logoutUser(Context ctx) throws DataAccessException {
+        userService.logout(ctx.headerMap().get("Authorization"));
+    }
+
+    private boolean isMalformed(Set<String> jsonKeys, String[] keys) {
+        if (jsonKeys.size() != keys.length) {
+            return true;
+        }
+        for (String key : keys) {
+            if (!jsonKeys.contains(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -26,7 +26,7 @@ public class UserService {
         if (user == null) {
             throw new DataAccessException("User does not exist");
         } else if (!Objects.equals(user.password(), loginRequest.password())) {
-            throw new DataAccessException("Invalid password");
+            throw new UnauthorizedException();
         }
 
         return createNewAuth(loginRequest);
@@ -38,16 +38,16 @@ public class UserService {
         return newUserAuth;
     }
 
-    public void logout(String authToken) throws DataAccessException {
+    public void logout(String authToken) throws UnauthorizedException {
         if (authAccess.getAuth(authToken) == null) {
-            throw new DataAccessException("Auth token does not exist");
+            throw new UnauthorizedException();
         }
 
         authAccess.deleteAuth(authToken);
     }
 
     public void clear() {
-        userAccess.clear();
+        MemoryUserDAO.clear();
     }
 
     private static String generateToken() {
