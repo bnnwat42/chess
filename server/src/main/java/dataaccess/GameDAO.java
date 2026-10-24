@@ -12,4 +12,6 @@ public interface GameDAO {
     Collection<GameData> listGames();
 
     void updateGame(GameData gameData);
+
+    void clear();
 }

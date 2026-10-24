@@ -100,6 +100,7 @@ public class Server {
     private void clearDatabase(Context ctx) {//throws ResponseException {
         try {
             userHandler.clear();
+            gameHandler.clear();
             ctx.status(200);
             ctx.result("{}");
         } catch (Exception e) {

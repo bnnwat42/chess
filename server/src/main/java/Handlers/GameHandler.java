@@ -67,4 +67,8 @@ public class GameHandler {
         gameService.joinGame(new JoinGameRequest(authToken, chessColor, id));
 
     }
+
+    public void clear() {
+        gameService.clear();
+    }
 }

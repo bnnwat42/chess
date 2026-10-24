@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -40,15 +41,33 @@ public class GameService {
         return newGame.gameID();
     }
 
-    public void joinGame(JoinGameRequest joinGameRequest) {
+    public void joinGame(JoinGameRequest joinGameRequest) throws AlreadyTakenException {
         if (authStorage.getAuth(joinGameRequest.authToken()) == null) {
             throw new UnauthorizedException();
         }
         GameData game = gameStorage.getGame(Integer.parseInt(joinGameRequest.gameID()));
+        String whiteName = "";
+        String blackName = "";
         if (joinGameRequest.teamColor() == ChessGame.TeamColor.WHITE) {
             if (!game.whiteUsername().isEmpty()) {
-                //throw new Exception();
+                throw new AlreadyTakenException();
+            } else {
+                AuthData authData = authStorage.getAuth(joinGameRequest.authToken());
+                whiteName = authData.username();
+            }
+        } else if (joinGameRequest.teamColor() == ChessGame.TeamColor.BLACK) {
+            if (!game.blackUsername().isEmpty()) {
+                throw new AlreadyTakenException();
+            } else {
+                AuthData authData = authStorage.getAuth(joinGameRequest.authToken());
+                blackName = authData.username();
             }
         }
+        GameData newGame = new GameData(game.gameID(), whiteName, blackName, game.gameName(), game.game());
+        gameStorage.updateGame(newGame);
+    }
+
+    public void clear() {
+        gameStorage.clear();
     }
 }

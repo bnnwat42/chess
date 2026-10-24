@@ -11,14 +11,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryGameDAOTest {
 
+    MemoryGameDAO memoryStorage;
+
     @BeforeEach
     void setUp() {
-        MemoryGameDAO.clear();
+        memoryStorage = new MemoryGameDAO();
+        memoryStorage.clear();
     }
 
     @Test
     void createGameAndGetGame() {
-        MemoryGameDAO memoryStorage = new MemoryGameDAO();
         GameData newGame = new GameData(123, "White", "Black", "The Battle of the Centuries", new ChessGame());
 
         memoryStorage.createGame(newGame);
@@ -35,7 +37,6 @@ class MemoryGameDAOTest {
     @Test
     void listGames() {
         HashSet<GameData> chessGames = new HashSet<>();
-        MemoryGameDAO memoryStorage = new MemoryGameDAO();
         int dummyId = 100;
 
         for (int i = 0; i < 10; i++) {
@@ -52,7 +53,6 @@ class MemoryGameDAOTest {
 
     @Test
     void updateGame() {
-        MemoryGameDAO memoryStorage = new MemoryGameDAO();
         GameData newGame = new GameData(123, "White", "Black", "The Battle of the Centuries", new ChessGame());
 
         memoryStorage.createGame(newGame);

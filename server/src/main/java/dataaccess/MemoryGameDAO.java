@@ -29,7 +29,7 @@ public class MemoryGameDAO implements GameDAO {
         gameStorage.put(gameData.gameID(), gameData);
     }
 
-    public static void clear() {
+    public void clear() {
         gameStorage.clear();
     }
 }
