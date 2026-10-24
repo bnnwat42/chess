@@ -33,7 +33,7 @@ public class GameHandler {
     public int createGame(Context ctx) {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, String> body = getBodyObject(ctx, Map.class);
-        if (isMalformed(body.keySet(), new String[]{"gameName"})) {
+        if (UserHandler.isMalformed(body.keySet(), new String[]{"gameName"})) {
             throw new BadRequestException();
         }
         return gameService.createGame(new CreateGameRequest(authToken, body.get("gameName")));
@@ -53,7 +53,7 @@ public class GameHandler {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, Object> body = getBodyObject(ctx, Map.class);
 
-        if (isMalformed(body.keySet(), new String[]{"playerColor", "gameID"})) {
+        if (UserHandler.isMalformed(body.keySet(), new String[]{"playerColor", "gameID"})) {
             throw new BadRequestException();
         }
 
@@ -84,8 +84,4 @@ public class GameHandler {
         gameService.clear();
     }
 
-
-    private boolean isMalformed(Set<String> jsonKeys, String[] keys) {
-        return UserHandler.isMalformed(jsonKeys, keys);
-    }
 }

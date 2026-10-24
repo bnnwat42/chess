@@ -64,10 +64,6 @@ public class ChessPiece {
         return name;
     }
 
-    public boolean canCastle() {
-        return canCastle;
-    }
-
     /**
      * The various different chess piece options
      */
