@@ -7,29 +7,29 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO {
 
-    static final private HashMap<Integer, GameData> gameStorage = new HashMap<>();
+    static final private HashMap<Integer, GameData> GAME_STORAGE = new HashMap<>();
 
     @Override
     public void createGame(GameData gameData) {
-        gameStorage.put(gameData.gameID(), gameData);
+        GAME_STORAGE.put(gameData.gameID(), gameData);
     }
 
     @Override
     public GameData getGame(int gameId) {
-        return gameStorage.get(gameId);
+        return GAME_STORAGE.get(gameId);
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return gameStorage.values();
+        return GAME_STORAGE.values();
     }
 
     @Override
     public void updateGame(GameData gameData) {
-        gameStorage.put(gameData.gameID(), gameData);
+        GAME_STORAGE.put(gameData.gameID(), gameData);
     }
 
     public void clear() {
-        gameStorage.clear();
+        GAME_STORAGE.clear();
     }
 }
