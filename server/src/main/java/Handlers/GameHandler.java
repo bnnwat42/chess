@@ -27,7 +27,6 @@ public class GameHandler {
     public String listGames(Context ctx) {
         Collection<GameInfo> gameList = gameService.listGames(ctx.headerMap().get("Authorization"));
 
-        //TODO: Convert list to JSON
         String jsonGames = new Gson().toJson(Map.of("games", gameList));
         return jsonGames;
     }

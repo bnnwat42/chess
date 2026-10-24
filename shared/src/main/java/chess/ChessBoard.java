@@ -24,17 +24,17 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) {
             return true;
-        } else if(obj instanceof ChessBoard objBoard){
-            for(int i=0; i<8; i++){
-                for(int j=0; j<8; j++){
-                    ChessPiece toCompare = objBoard.getPiece(new ChessPosition(i+1,j+1));
-                    if(board[i][j] == null || toCompare == null){
-                        if(board[i][j] != toCompare){
+        } else if (obj instanceof ChessBoard objBoard) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    ChessPiece toCompare = objBoard.getPiece(new ChessPosition(i + 1, j + 1));
+                    if (board[i][j] == null || toCompare == null) {
+                        if (board[i][j] != toCompare) {
                             return false;
                         }
-                    } else if(!(board[i][j].equals(toCompare))){
+                    } else if (!(board[i][j].equals(toCompare))) {
                         return false;
                     }
                 }
@@ -47,9 +47,9 @@ public class ChessBoard {
     @Override
     public String toString() {
         var name = "|";
-        for(ChessPiece[] c: board){
-            for(ChessPiece p : c){
-                if(p == null){
+        for (ChessPiece[] c : board) {
+            for (ChessPiece p : c) {
+                if (p == null) {
                     name += " |";
                 } else {
                     name += p.toString() + "|";
@@ -69,12 +69,12 @@ public class ChessBoard {
      *
      * @param toCopy The board to copy
      */
-    public ChessBoard(ChessBoard toCopy){
+    public ChessBoard(ChessBoard toCopy) {
         board = new ChessPiece[8][8];
 
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                board[i][j] = toCopy.getPiece(new ChessPosition(i+1, j+1));
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = toCopy.getPiece(new ChessPosition(i + 1, j + 1));
             }
         }
     }
@@ -85,14 +85,14 @@ public class ChessBoard {
      * @param base The original board
      * @param move The move to do on board
      */
-    public ChessBoard(ChessBoard base, ChessMove move){
+    public ChessBoard(ChessBoard base, ChessMove move) {
         board = new ChessPiece[8][8];
         ChessPosition start = move.getStartPosition();
         ChessPosition end = move.getEndPosition();
 
-        for (int i=0; i<8; i++){
-            for (int j=0; j<8; j++){
-                board[i][j] = base.getPiece(new ChessPosition(i+1, j+1));
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][j] = base.getPiece(new ChessPosition(i + 1, j + 1));
             }
         }
         ChessPiece.PieceType newType = (move.getPromotionPiece() == null) ? base.getPiece(start).getPieceType() : move.getPromotionPiece();
@@ -107,7 +107,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        board[position.getRow()-1][position.getColumn()-1] = piece;
+        board[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -118,7 +118,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return board[position.getRow()-1][position.getColumn()-1];
+        return board[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -126,12 +126,12 @@ public class ChessBoard {
      *
      * @param teamColor the color of pieces to get
      */
-    private ArrayList<ChessPosition> getPiecePositions(ChessGame.TeamColor teamColor){
+    private ArrayList<ChessPosition> getPiecePositions(ChessGame.TeamColor teamColor) {
         ArrayList<ChessPosition> piecePositions = new ArrayList<>();
-        for (int i=0; i<8; i++) {
-            for (int j=0; j < 8; j++) {
-                if(board[i][j] != null && board[i][j].getTeamColor() == teamColor){
-                    piecePositions.add(new ChessPosition(i+1, j+1));
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] != null && board[i][j].getTeamColor() == teamColor) {
+                    piecePositions.add(new ChessPosition(i + 1, j + 1));
                 }
             }
         }
@@ -144,13 +144,12 @@ public class ChessBoard {
      * @param teamColor color of king to get
      */
     private ChessPosition getKingPosition(ChessGame.TeamColor teamColor) {
-        for(ChessPosition c : getPiecePositions(teamColor)){
-            if(this.getPiece(c).getPieceType() == KING){
+        for (ChessPosition c : getPiecePositions(teamColor)) {
+            if (this.getPiece(c).getPieceType() == KING) {
                 return c;
             }
         }
-        //TODO: Throw exception instead of return null
-        return null ;
+        return null;
     }
 
 
@@ -160,10 +159,10 @@ public class ChessBoard {
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
-        for(ChessGame.TeamColor color : new ChessGame.TeamColor[] {WHITE, BLACK}){
+        for (ChessGame.TeamColor color : new ChessGame.TeamColor[]{WHITE, BLACK}) {
             //Pawns
             int side = (color == WHITE) ? 2 : 7;
-            for(int i=1; i<=8; i++){
+            for (int i = 1; i <= 8; i++) {
                 this.addPiece(new ChessPosition(side, i), new ChessPiece(color, PAWN));
             }
             side = (color == WHITE) ? 1 : 8;
@@ -189,7 +188,7 @@ public class ChessBoard {
         ChessBoard testBoard = new ChessBoard(this);
         ChessPosition kingPosition = this.getKingPosition(teamColor);
 
-        for(ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
+        for (ChessPiece.PieceType p : ChessPiece.PieceType.values()) {
             ChessPiece holderPiece = new ChessPiece(teamColor, p);
             testBoard.addPiece(kingPosition, holderPiece);
             Collection<ChessMove> moves = holderPiece.pieceMoves(testBoard, kingPosition);
@@ -209,7 +208,7 @@ public class ChessBoard {
         Collection<ChessPosition> piecePositions = getPiecePositions(teamColor);
 
         //For each position that has a piece of that color
-        for(ChessPosition testPosition : piecePositions) {
+        for (ChessPosition testPosition : piecePositions) {
             //Get the piece
             ChessPiece testPiece = this.getPiece(testPosition);
             //For each possible move that piece could make

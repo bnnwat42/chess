@@ -29,22 +29,22 @@ public class ChessPiece {
         this.canCastle = canCastle;
     }
 
-    public ChessPiece(ChessPiece toCopy){
+    public ChessPiece(ChessPiece toCopy) {
         this.pieceColor = toCopy.getTeamColor();
         this.type = toCopy.getPieceType();
         canCastle = false;
     }
 
-        @Override
+    @Override
     public int hashCode() {
         return pieceColor.hashCode() * type.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj){
+        if (this == obj) {
             return true;
-        } else if(obj instanceof chess.ChessPiece objPiece){
+        } else if (obj instanceof chess.ChessPiece objPiece) {
             return objPiece.getPieceType() == type && objPiece.getTeamColor() == pieceColor; //&& objPiece.canCastle() == canCastle;
         }
         return false;
@@ -53,12 +53,12 @@ public class ChessPiece {
     @Override
     public String toString() {
         var name = "";
-        if(type == PieceType.KNIGHT){
+        if (type == PieceType.KNIGHT) {
             name += "N";
         } else {
             name += type.toString().charAt(0);
         }
-        if(pieceColor == ChessGame.TeamColor.BLACK){
+        if (pieceColor == ChessGame.TeamColor.BLACK) {
             name = name.toLowerCase();
         }
         return name;
@@ -110,36 +110,36 @@ public class ChessPiece {
         int[][] directions = {};
 
         int depth = -1;
-        switch (myType){
+        switch (myType) {
             case PAWN:
                 return pawnsAreSpecial(board, myPosition, myColor);
             case ROOK:
-                directions = new int[][] {{1,0},{0,1},{-1,0},{0,-1}};
+                directions = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
                 break;
             case BISHOP:
-                directions = new int[][] {{1,1},{1,-1},{-1,1},{-1,-1}};
+                directions = new int[][]{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 break;
             case QUEEN:
-                directions = new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+                directions = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 break;
             case KING:
-                directions = new int[][] {{1,0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}};
+                directions = new int[][]{{1, 0}, {0, 1}, {-1, 0}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
                 depth = 1;
                 //Castling
                 //myMoves.addAll(castlingCheck(board, myPosition, myColor));
                 break;
             case KNIGHT:
-                directions = new int[][] {{1,2},{2,1},{-1,2},{2,-1},{-2,1},{1,-2},{-1,-2},{-2,-1}};
+                directions = new int[][]{{1, 2}, {2, 1}, {-1, 2}, {2, -1}, {-2, 1}, {1, -2}, {-1, -2}, {-2, -1}};
                 depth = 1;
                 break;
         }
 
-        for(int[] dir : directions){
+        for (int[] dir : directions) {
             int counter = 0;
             while (depth != counter) {
                 counter++;
                 ChessPosition positionToConsider = new ChessPosition(myPosition, counter * dir[0], counter * dir[1]);
-                if(positionToConsider.outOfBounds()){
+                if (positionToConsider.outOfBounds()) {
                     break;
                 }
                 chess.ChessPiece pieceToConsider = board.getPiece(positionToConsider);
@@ -156,12 +156,12 @@ public class ChessPiece {
         return myMoves;
     }
 
-    private Collection<ChessMove> castlingCheck(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor){
+    private Collection<ChessMove> castlingCheck(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
         ArrayList<ChessMove> castlingMoves = new ArrayList<>();
-        if(!canCastle || board.isInCheck(myColor)){
+        if (!canCastle || board.isInCheck(myColor)) {
             return castlingMoves;
         }
-        for(int castlePosition : new int[] {1,8}) {
+        for (int castlePosition : new int[]{1, 8}) {
             ChessPiece rook = board.getPiece(new ChessPosition(myPosition.getRow(), castlePosition));
             boolean validCastle = rook.canCastle();
             if (validCastle) {
@@ -172,9 +172,6 @@ public class ChessPiece {
                         validCastle = false;
                         break;
                     }
-                }
-                if(validCastle){
-                    //TODO make a castling chessmove
                 }
             }
         }
@@ -188,9 +185,9 @@ public class ChessPiece {
         ChessPosition testPos;
         //Check in front
         testPos = new ChessPosition(myPosition, dir, 0);
-        if(!testPos.outOfBounds() && board.getPiece(testPos) == null){
+        if (!testPos.outOfBounds() && board.getPiece(testPos) == null) {
             pawnList.addAll(toPromoteOrNotToPromote(myPosition, testPos));
-            if(myPosition.getRow() == ((dir == 1) ? 2 : 7)) {
+            if (myPosition.getRow() == ((dir == 1) ? 2 : 7)) {
                 testPos = new ChessPosition(myPosition, dir * 2, 0);
                 if (board.getPiece(testPos) == null) {
                     pawnList.addAll(toPromoteOrNotToPromote(myPosition, testPos));
@@ -198,9 +195,9 @@ public class ChessPiece {
             }
         }
         //Check sides
-        for(int i : new int[] {-1,1}) {
+        for (int i : new int[]{-1, 1}) {
             testPos = new ChessPosition(myPosition, dir, i);
-            if(testPos.outOfBounds()){
+            if (testPos.outOfBounds()) {
                 break;
             }
             if (board.getPiece(testPos) != null) {
@@ -212,10 +209,10 @@ public class ChessPiece {
         return pawnList;
     }
 
-    private Collection<ChessMove> toPromoteOrNotToPromote(ChessPosition startPosition, ChessPosition endPosition){
+    private Collection<ChessMove> toPromoteOrNotToPromote(ChessPosition startPosition, ChessPosition endPosition) {
         ArrayList<ChessMove> promotionList = new ArrayList<>();
 
-        if(endPosition.getRow() == 1 || endPosition.getRow() == 8){
+        if (endPosition.getRow() == 1 || endPosition.getRow() == 8) {
             promotionList.add(new ChessMove(startPosition, endPosition, PieceType.QUEEN));
             promotionList.add(new ChessMove(startPosition, endPosition, PieceType.ROOK));
             promotionList.add(new ChessMove(startPosition, endPosition, PieceType.BISHOP));
