@@ -9,9 +9,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryAuthDAOTest {
 
+    MemoryAuthDAO memoryStorage;
+
     @BeforeEach
     void setUp() {
-        MemoryAuthDAO.clear();
+        memoryStorage = new MemoryAuthDAO();
+        memoryStorage.clear();
     }
 
     @Test
@@ -19,7 +22,6 @@ class MemoryAuthDAOTest {
         String authToken = "abc123";
         String username = "Bob";
 
-        MemoryAuthDAO memoryStorage = new MemoryAuthDAO();
         AuthData newAuth = new AuthData(authToken, username);
         memoryStorage.createAuth(newAuth);
 

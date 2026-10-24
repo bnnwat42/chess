@@ -9,14 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MemoryUserDAOTest {
 
+    MemoryUserDAO memoryStorage;
+
     @BeforeEach
     void setUp() {
-        MemoryUserDAO.clear();
+        memoryStorage = new MemoryUserDAO();
+        memoryStorage.clear();
     }
 
     @Test
     void createUserAndGetUser() {
-        MemoryUserDAO memoryStorage = new MemoryUserDAO();
         UserData newUser = new UserData("Bob", "1234", "bobby@tables.xkcd");
         assertDoesNotThrow(() -> memoryStorage.createUser(newUser));
 

@@ -35,7 +35,7 @@ public class GameService {
             throw new UnauthorizedException();
         }
         int newId = gameId++;
-        GameData newGame = new GameData(newId, "", "", newGameRequest.gameName(), new ChessGame());
+        GameData newGame = new GameData(newId, null, null, newGameRequest.gameName(), new ChessGame());
 
         gameStorage.createGame(newGame);
         return newGame.gameID();
@@ -46,17 +46,17 @@ public class GameService {
             throw new UnauthorizedException();
         }
         GameData game = gameStorage.getGame(Integer.parseInt(joinGameRequest.gameID()));
-        String whiteName = "";
-        String blackName = "";
+        String whiteName = game.whiteUsername();
+        String blackName = game.blackUsername();
         if (joinGameRequest.teamColor() == ChessGame.TeamColor.WHITE) {
-            if (!game.whiteUsername().isEmpty()) {
+            if (game.whiteUsername() != null) {
                 throw new AlreadyTakenException();
             } else {
                 AuthData authData = authStorage.getAuth(joinGameRequest.authToken());
                 whiteName = authData.username();
             }
         } else if (joinGameRequest.teamColor() == ChessGame.TeamColor.BLACK) {
-            if (!game.blackUsername().isEmpty()) {
+            if (game.blackUsername() != null) {
                 throw new AlreadyTakenException();
             } else {
                 AuthData authData = authStorage.getAuth(joinGameRequest.authToken());

@@ -24,7 +24,7 @@ public class UserService {
     public AuthData login(UserData loginRequest) throws DataAccessException {
         UserData user = userAccess.getUser(loginRequest.username());
         if (user == null) {
-            throw new BadRequestException();
+            throw new UnauthorizedException();
         } else if (!Objects.equals(user.password(), loginRequest.password())) {
             throw new UnauthorizedException();
         }
@@ -47,7 +47,8 @@ public class UserService {
     }
 
     public void clear() {
-        MemoryUserDAO.clear();
+        userAccess.clear();
+        authAccess.clear();
     }
 
     private static String generateToken() {

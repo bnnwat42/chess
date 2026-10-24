@@ -30,7 +30,7 @@ class UserServiceTest {
     void login() {
         AuthData firstAuth = assertDoesNotThrow(() -> myLogin.register(testUser));
 
-        assertThrows(BadRequestException.class, () -> myLogin.login(new UserData("Tom", "4321", "devil@asu.edu")));
+        assertThrows(UnauthorizedException.class, () -> myLogin.login(new UserData("Tom", "4321", "devil@asu.edu")));
         AuthData secondAuth = assertDoesNotThrow(() -> myLogin.login(testUser));
         assertNotEquals(firstAuth, secondAuth);
     }

@@ -23,7 +23,7 @@ public class MemoryUserDAO implements UserDAO {
         return users.get(userName);
     }
 
-    public static void clear() {
+    public void clear() {
         users.clear();
     }
 }

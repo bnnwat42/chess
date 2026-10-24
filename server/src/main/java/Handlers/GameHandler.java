@@ -14,6 +14,7 @@ import service.JoinGameRequest;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class GameHandler {
 
@@ -28,14 +29,15 @@ public class GameHandler {
 
         //TODO: Convert list to JSON
         String jsonGames = new Gson().toJson(Map.of("games", gameList));
-
-        System.out.println(jsonGames);
         return jsonGames;
     }
 
     public int createGame(Context ctx) {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, String> body = getBodyObject(ctx, Map.class);
+        if (isMalformed(body.keySet(), new String[]{"gameName"})) {
+            throw new BadRequestException();
+        }
         return gameService.createGame(new CreateGameRequest(authToken, body.get("gameName")));
     }
 
@@ -52,15 +54,14 @@ public class GameHandler {
     public void joinGame(Context ctx) throws AlreadyTakenException {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, Object> body = getBodyObject(ctx, Map.class);
-        String color = body.get("playerColor").toString();
-        ChessGame.TeamColor chessColor;
-        if (Objects.equals(color, "WHITE")) {
-            chessColor = ChessGame.TeamColor.WHITE;
-        } else if (Objects.equals(color, "BLACK")) {
-            chessColor = ChessGame.TeamColor.BLACK;
-        } else {
+
+        if (isMalformed(body.keySet(), new String[]{"playerColor", "gameID"})) {
             throw new BadRequestException();
         }
+
+        Object color = body.get("playerColor");
+        ChessGame.TeamColor chessColor;
+        chessColor = convertToColor(color);
         //Forgive me for this
         String id = String.valueOf(Integer.parseInt(body.get("gameID").toString().split("\\.")[0]));
 
@@ -68,7 +69,32 @@ public class GameHandler {
 
     }
 
+    private ChessGame.TeamColor convertToColor(Object color) {
+        if (color == null) {
+            throw new BadRequestException();
+        }
+        if (Objects.equals(color, "WHITE")) {
+            return ChessGame.TeamColor.WHITE;
+        } else if (Objects.equals(color, "BLACK")) {
+            return ChessGame.TeamColor.BLACK;
+        } else {
+            throw new BadRequestException();
+        }
+    }
+
     public void clear() {
         gameService.clear();
+    }
+
+    private boolean isMalformed(Set<String> jsonKeys, String[] keys) {
+        if (jsonKeys.size() != keys.length) {
+            return true;
+        }
+        for (String key : keys) {
+            if (!jsonKeys.contains(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
