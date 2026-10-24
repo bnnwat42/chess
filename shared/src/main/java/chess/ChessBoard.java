@@ -3,6 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 import static chess.ChessPiece.PieceType.*;
 import static chess.ChessGame.TeamColor.*;
@@ -26,22 +27,19 @@ public class ChessBoard {
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
-        } else if (obj instanceof ChessBoard objBoard) {
-            for (int i = 0; i < 8; i++) {
-                for (int j = 0; j < 8; j++) {
-                    ChessPiece toCompare = objBoard.getPiece(new ChessPosition(i + 1, j + 1));
-                    if (board[i][j] == null || toCompare == null) {
-                        if (board[i][j] != toCompare) {
-                            return false;
-                        }
-                    } else if (!(board[i][j].equals(toCompare))) {
-                        return false;
-                    }
+        }
+        if (!(obj instanceof ChessBoard other)) {
+            return false;
+        }
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (!Objects.equals(board[i][j], other.board[i][j])) {
+                    return false;
                 }
             }
-            return true;
         }
-        return false;
+        return true;
     }
 
     @Override

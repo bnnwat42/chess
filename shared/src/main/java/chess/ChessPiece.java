@@ -156,28 +156,6 @@ public class ChessPiece {
         return myMoves;
     }
 
-    private Collection<ChessMove> castlingCheck(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
-        ArrayList<ChessMove> castlingMoves = new ArrayList<>();
-        if (!canCastle || board.isInCheck(myColor)) {
-            return castlingMoves;
-        }
-        for (int castlePosition : new int[]{1, 8}) {
-            ChessPiece rook = board.getPiece(new ChessPosition(myPosition.getRow(), castlePosition));
-            boolean validCastle = rook.canCastle();
-            if (validCastle) {
-                for (int positionShift : new int[]{1, 2}) {
-                    ChessPosition testPosition = new ChessPosition(myPosition, 0, positionShift);
-                    ChessBoard testBoard = new ChessBoard(board, new ChessMove(myPosition, testPosition, null));
-                    if (testBoard.isInCheck(myColor)) {
-                        validCastle = false;
-                        break;
-                    }
-                }
-            }
-        }
-        return castlingMoves;
-    }
-
     private Collection<ChessMove> pawnsAreSpecial(ChessBoard board, ChessPosition myPosition, ChessGame.TeamColor myColor) {
         ArrayList<ChessMove> pawnList = new ArrayList<>();
         int dir = (myColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
