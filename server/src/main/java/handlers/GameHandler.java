@@ -1,11 +1,10 @@
-package Handlers;
+package handlers;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
 import dataaccess.BadRequestException;
 import io.javalin.http.Context;
-import model.GameData;
 import service.CreateGameRequest;
 import service.GameInfo;
 import service.GameService;

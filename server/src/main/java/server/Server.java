@@ -1,18 +1,15 @@
 package server;
 
-import Handlers.GameHandler;
-import Handlers.UserHandler;
+import handlers.GameHandler;
+import handlers.UserHandler;
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
 import dataaccess.BadRequestException;
 import dataaccess.UnauthorizedException;
 import io.javalin.*;
 import io.javalin.http.*;
-import model.AuthData;
-import model.GameData;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.Map;
 
 

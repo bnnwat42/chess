@@ -37,10 +37,10 @@ class MemoryGameDAOTest {
     @Test
     void listGames() {
         HashSet<GameData> chessGames = new HashSet<>();
-        int dummyId = 100;
+        int ID = 100;
 
         for (int i = 0; i < 10; i++) {
-            GameData newGame = new GameData(dummyId++, Integer.toString(dummyId++), Integer.toString(dummyId++), Integer.toString(dummyId++), new ChessGame());
+            GameData newGame = new GameData(ID++, Integer.toString(ID++), Integer.toString(ID++), Integer.toString(ID++), new ChessGame());
             chessGames.add(newGame);
             memoryStorage.createGame(newGame);
         }
