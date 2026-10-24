@@ -85,15 +85,8 @@ public class GameHandler {
         gameService.clear();
     }
 
+
     private boolean isMalformed(Set<String> jsonKeys, String[] keys) {
-        if (jsonKeys.size() != keys.length) {
-            return true;
-        }
-        for (String key : keys) {
-            if (!jsonKeys.contains(key)) {
-                return true;
-            }
-        }
-        return false;
+        return UserHandler.isMalformed(jsonKeys, keys);
     }
 }

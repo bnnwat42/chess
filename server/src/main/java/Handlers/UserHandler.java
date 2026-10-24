@@ -65,7 +65,8 @@ public class UserHandler {
         userService.logout(ctx.headerMap().get("Authorization"));
     }
 
-    private boolean isMalformed(Set<String> jsonKeys, String[] keys) {
+    //This is static to be shared by the 2 handlers because the quality check didn't like duplicate code
+    public static boolean isMalformed(Set<String> jsonKeys, String[] keys) {
         if (jsonKeys.size() != keys.length) {
             return true;
         }
