@@ -24,7 +24,7 @@ public class UserService {
     public AuthData login(UserData loginRequest) throws DataAccessException {
         UserData user = userAccess.getUser(loginRequest.username());
         if (user == null) {
-            throw new DataAccessException("User does not exist");
+            throw new BadRequestException();
         } else if (!Objects.equals(user.password(), loginRequest.password())) {
             throw new UnauthorizedException();
         }

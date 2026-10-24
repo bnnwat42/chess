@@ -51,8 +51,8 @@ public class GameHandler {
 
     public void joinGame(Context ctx) throws AlreadyTakenException {
         String authToken = ctx.headerMap().get("Authorization");
-        Map<String, String> body = getBodyObject(ctx, Map.class);
-        String color = body.get("playerColor");
+        Map<String, Object> body = getBodyObject(ctx, Map.class);
+        String color = body.get("playerColor").toString();
         ChessGame.TeamColor chessColor;
         if (Objects.equals(color, "WHITE")) {
             chessColor = ChessGame.TeamColor.WHITE;
@@ -61,7 +61,8 @@ public class GameHandler {
         } else {
             throw new BadRequestException();
         }
-        String id = body.get("gameID");
+        //Forgive me for this
+        String id = String.valueOf(Integer.parseInt(body.get("gameID").toString().split("\\.")[0]));
 
         gameService.joinGame(new JoinGameRequest(authToken, chessColor, id));
 

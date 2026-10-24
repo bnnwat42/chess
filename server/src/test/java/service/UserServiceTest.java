@@ -1,8 +1,6 @@
 package service;
 
-import dataaccess.DataAccessException;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,32 +10,36 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserServiceTest {
 
+    private UserService myLogin;
+    private UserData testUser;
+
     @BeforeEach
     void setUp() {
-        MemoryAuthDAO.clear();
-        MemoryUserDAO.clear();
+        myLogin = new UserService();
+        myLogin.clear();
+        testUser = new UserData("Bob", "1234", "cosmo@byu.edu");
     }
 
     @Test
     void registerRealPerson() {
-        UserService myLogin = new UserService();
-        UserData newUser = new UserData("Bob", "1234", "cosmo@byu.edu");
-
-        assertDoesNotThrow(() -> myLogin.register(newUser));
-        assertThrows(DataAccessException.class, () -> myLogin.register(newUser));
+        assertDoesNotThrow(() -> myLogin.register(testUser));
+        assertThrows(AlreadyTakenException.class, () -> myLogin.register(testUser));
     }
 
     @Test
     void login() {
-        UserService myLogin = new UserService();
-        UserData newUser = new UserData("Bob", "1234", "cosmo@byu.edu");
-        AuthData newAuth = assertDoesNotThrow(() -> myLogin.register(newUser));
+        AuthData firstAuth = assertDoesNotThrow(() -> myLogin.register(testUser));
 
-        assertThrows(DataAccessException.class, () -> myLogin.login(new UserData("Tom", "4321", "devil@asu.edu")));
-        //assertEquals(myLogin, myLogin);
+        assertThrows(BadRequestException.class, () -> myLogin.login(new UserData("Tom", "4321", "devil@asu.edu")));
+        AuthData secondAuth = assertDoesNotThrow(() -> myLogin.login(testUser));
+        assertNotEquals(firstAuth, secondAuth);
     }
 
     @Test
     void logout() {
+        AuthData authData = assertDoesNotThrow(() -> myLogin.register(testUser));
+
+        assertDoesNotThrow(() -> myLogin.logout(authData.authToken()));
+        assertThrows(UnauthorizedException.class, () -> myLogin.logout("invalid-token-xyz"));
     }
 }
