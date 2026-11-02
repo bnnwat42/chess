@@ -7,9 +7,9 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
 
-public class SQLGameDAO implements GameDAO{
+public class SQLGameDAO implements GameDAO {
 
-    public SQLGameDAO(){
+    public SQLGameDAO() {
         try {
             DatabaseManager.updateDatabase("CREATE TABLE IF NOT EXISTS games (" +
                     "gameID INT NOT NULL," +
@@ -21,7 +21,15 @@ public class SQLGameDAO implements GameDAO{
 
     @Override
     public void createGame(GameData gameData) {
-
+        String updateString = String.format("INSERT INTO games (gameID, gameData) VALUE (\"%s\", \"%s\");",
+                gameData.gameID(), gameData.game().toString()
+        );
+        System.out.println(gameData.game().toString());
+        try {
+            DatabaseManager.updateDatabase(updateString);
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
