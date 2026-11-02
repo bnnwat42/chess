@@ -1,0 +1,46 @@
+package dataaccess;
+
+import exceptions.DataAccessException;
+import model.GameData;
+
+import java.sql.SQLException;
+import java.util.Collection;
+import java.util.List;
+
+public class SQLGameDAO implements GameDAO{
+
+    public SQLGameDAO(){
+        try {
+            DatabaseManager.updateDatabase("CREATE TABLE IF NOT EXISTS games (" +
+                    "gameID INT NOT NULL," +
+                    "gameData TEXT NOT NULL,");
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void createGame(GameData gameData) {
+
+    }
+
+    @Override
+    public GameData getGame(int gameIdentifier) {
+        return null;
+    }
+
+    @Override
+    public Collection<GameData> listGames() {
+        return List.of();
+    }
+
+    @Override
+    public void updateGame(GameData gameData) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+}
