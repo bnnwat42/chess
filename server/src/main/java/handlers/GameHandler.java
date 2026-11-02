@@ -2,8 +2,8 @@ package handlers;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
+import exceptions.AlreadyTakenException;
+import exceptions.BadRequestException;
 import io.javalin.http.Context;
 import service.CreateGameRequest;
 import service.GameInfo;
@@ -13,7 +13,6 @@ import service.JoinGameRequest;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class GameHandler {
 

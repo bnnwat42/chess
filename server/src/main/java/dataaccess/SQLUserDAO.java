@@ -1,47 +1,65 @@
 package dataaccess;
 
+import exceptions.AlreadyTakenException;
+import exceptions.DataAccessException;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Map;
 
 public class SQLUserDAO implements UserDAO {
+
+    public SQLUserDAO() {
+        try {
+            DatabaseManager.updateDatabase("CREATE TABLE IF NOT EXISTS users (" +
+                    "username VARCHAR(255) NOT NULL," +
+                    "password VARCHAR(255) NOT NULL," +
+                    "email VARCHAR(255) NOT NULL);");
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void createUser(UserData userInfo) throws AlreadyTakenException {
-        //Try and create table
-        sqlRunner("CREATE TABLE users (username VARCHAR(255) NOT NULL , password VARCHAR(255) NOT NULL , email VARCHAR(255))");
-
-        var hashedPassword = passwordHasher(userInfo.password());
-        var userInputString = String.format("INSERT INTO users VALUES (%s, %s, %s)", userInfo.username(), hashedPassword, userInfo.email());
-        sqlRunner(userInputString);
-    }
-
-    @Override
-    public UserData getUser(String userName) {
-        var getUserInput = String.format("SELECT * FROM users where username=\"%s\"", userName);
-        sqlRunner(userInputString);
-        return
-    }
-
-    @Override
-    public void clear() {
-
-    }
-
-    private void sqlRunner(String sqlStatement) {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
-                var rs = preparedStatement.executeQuery();
-                rs.next();
-                System.out.println(rs.getInt(1));
-            }
+        String updateString = String.format("INSERT INTO users (username, password, email) VALUE (\"%s\", \"%s\", \"%s\");",
+                userInfo.username(), userInfo.password(), userInfo.email()
+        );
+        try {
+            DatabaseManager.updateDatabase(updateString);
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
-    String passwordHasher(String clearTextPassword) {
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
-        return hashedPassword;
+    @Override
+    public UserData getUser(String userName) {
+        ArrayList<Map<String, String>> response;
+        String retrivalString = String.format("SELECT * FROM users WHERE username=\"%s\";", userName);
+        try {
+            response = DatabaseManager.retrieveFromDatabase(retrivalString);
+        } catch (DataAccessException | SQLException e) {
+            throw new RuntimeException(e);
+        }
+        Map<String, String> userMap = response.getFirst();
+        return new UserData(userMap.get("username"), userMap.get("password"), userMap.get("email"));
     }
+
+    @Override
+    public void clear() {
+        try {
+            DatabaseManager.updateDatabase("TRUNCATE TABLE users");
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+
 }

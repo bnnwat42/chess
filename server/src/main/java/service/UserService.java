@@ -1,6 +1,9 @@
 package service;
 
 import dataaccess.*;
+import exceptions.AlreadyTakenException;
+import exceptions.DataAccessException;
+import exceptions.UnauthorizedException;
 import model.*;
 
 import java.util.Objects;

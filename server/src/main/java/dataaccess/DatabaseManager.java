@@ -1,6 +1,11 @@
 package dataaccess;
 
+import exceptions.DataAccessException;
+
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -73,5 +78,36 @@ public class DatabaseManager {
         var host = props.getProperty("db.host");
         var port = Integer.parseInt(props.getProperty("db.port"));
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
+    }
+
+    public static void updateDatabase(String statement) throws DataAccessException, SQLException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.executeUpdate();
+            }
+        }
+    }
+
+    public static ArrayList<Map<String, String>> retrieveFromDatabase(String statement) throws DataAccessException, SQLException {
+        ArrayList<Map<String, String>> rows = new ArrayList<>();
+
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                var rs = preparedStatement.executeQuery();
+                var metaData = rs.getMetaData();
+                int colCount = metaData.getColumnCount();
+
+                while (rs.next()) {
+                    Map<String, String> row = new HashMap<>();
+                    for (int i = 1; i <= colCount; i++) {
+                        String colName = metaData.getColumnName(i);
+                        String str = rs.getString(i);
+                        row.put(colName, str);
+                    }
+                    rows.add(row);
+                }
+            }
+        }
+        return rows;
     }
 }
