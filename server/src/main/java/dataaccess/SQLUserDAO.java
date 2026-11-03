@@ -13,12 +13,21 @@ import java.util.Map;
 public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() {
-        try {
-            DatabaseManager.updateDatabase("CREATE TABLE IF NOT EXISTS users (" +
-                    "username VARCHAR(255) NOT NULL," +
+
+        try (var conn = DatabaseManager.getConnection()) {
+            conn.setCatalog("chess");
+
+            var createPetTable = "CREATE TABLE IF NOT EXISTS users (" +
+                    "username VARCHAR(255) NOT NULL PRIMARY KEY," +
                     "password VARCHAR(255) NOT NULL," +
-                    "email VARCHAR(255) NOT NULL);");
-        } catch (DataAccessException | SQLException e) {
+                    "email VARCHAR(255) NOT NULL);";
+
+            try (var createTableStatement = conn.prepareStatement(createPetTable)) {
+                createTableStatement.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
     }

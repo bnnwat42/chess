@@ -8,10 +8,12 @@ import java.util.HashMap;
 public class MemoryGameDAO implements GameDAO {
 
     static final private HashMap<Integer, GameData> GAME_STORAGE = new HashMap<>();
+    static private int idCounter = 0;
 
     @Override
-    public void createGame(GameData gameData) {
-        GAME_STORAGE.put(gameData.gameID(), gameData);
+    public int createGame(GameData gameData) {
+        GAME_STORAGE.put(idCounter, gameData);
+        return idCounter++;
     }
 
     @Override

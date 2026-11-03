@@ -39,8 +39,7 @@ public class GameService {
         int newId = gameId++;
         GameData newGame = new GameData(newId, null, null, newGameRequest.gameName(), new ChessGame());
 
-        gameStorage.createGame(newGame);
-        return newGame.gameID();
+        return gameStorage.createGame(newGame);
     }
 
     public void joinGame(JoinGameRequest joinGameRequest) throws AlreadyTakenException {
