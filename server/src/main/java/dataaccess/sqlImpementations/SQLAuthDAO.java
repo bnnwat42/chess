@@ -14,7 +14,7 @@ public class SQLAuthDAO implements AuthDAO {
     public SQLAuthDAO() {
         var createPetTable = "CREATE TABLE IF NOT EXISTS authTokens (" +
                 "authToken VARCHAR(255) NOT NULL PRIMARY KEY," +
-                "userName VARCHAR(255) NOT NULL);";
+                "username VARCHAR(255) NOT NULL);";
         try {
             DatabaseManager.updateDatabase(createPetTable);
         } catch (DataAccessException ex) {
@@ -26,7 +26,7 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void createAuth(AuthData authData) {
-        String updateString = "INSERT INTO authTokens (authToken, userName) VALUE (?, ?);";
+        String updateString = "INSERT INTO authTokens (authToken, username) VALUE (?, ?);";
         try {
             DatabaseManager.updateDatabase(updateString, authData.authToken(), authData.username());
         } catch (SQLException | DataAccessException e) {
