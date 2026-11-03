@@ -1,7 +1,10 @@
 package service;
 
 import chess.ChessGame;
-import dataaccess.*;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.GameDAO;
+import dataaccess.memoryImplementations.MemoryAuthDAO;
+import dataaccess.memoryImplementations.MemoryGameDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.UnauthorizedException;
 import model.AuthData;

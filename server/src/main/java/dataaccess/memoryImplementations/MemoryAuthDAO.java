@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memoryImplementations;
 
+import dataaccess.interfaces.AuthDAO;
 import model.AuthData;
 
 import java.util.HashMap;

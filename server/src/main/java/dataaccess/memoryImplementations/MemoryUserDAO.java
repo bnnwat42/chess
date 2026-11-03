@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memoryImplementations;
 
+import dataaccess.interfaces.UserDAO;
 import exceptions.AlreadyTakenException;
 import model.*;
 

@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.interfaces;
 
 import exceptions.AlreadyTakenException;
 import model.UserData;

@@ -1,11 +1,11 @@
-package dataaccess;
+package dataaccess.sqlImpementations;
 
+import dataaccess.interfaces.UserDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
@@ -14,31 +14,26 @@ public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() {
 
-        try (var conn = DatabaseManager.getConnection()) {
-            conn.setCatalog("chess");
+        var createPetTable = "CREATE TABLE IF NOT EXISTS users (" +
+                "username VARCHAR(255) NOT NULL PRIMARY KEY," +
+                "password VARCHAR(255) NOT NULL," +
+                "email VARCHAR(255) NOT NULL);";
 
-            var createPetTable = "CREATE TABLE IF NOT EXISTS users (" +
-                    "username VARCHAR(255) NOT NULL PRIMARY KEY," +
-                    "password VARCHAR(255) NOT NULL," +
-                    "email VARCHAR(255) NOT NULL);";
-
-            try (var createTableStatement = conn.prepareStatement(createPetTable)) {
-                createTableStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
+        try {
+            DatabaseManager.updateDatabase(createPetTable);
+        } catch (DataAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
     @Override
     public void createUser(UserData userInfo) throws AlreadyTakenException {
-        String updateString = String.format("INSERT INTO users (username, password, email) VALUE (\"%s\", \"%s\", \"%s\");",
-                userInfo.username(), userInfo.password(), userInfo.email()
-        );
+        String updateString = "INSERT INTO users (username, password, email) VALUE (?, ?, ?);";
+        String hashedPassword = hashPassword(userInfo.password());
         try {
-            DatabaseManager.updateDatabase(updateString);
+            DatabaseManager.updateDatabase(updateString, userInfo.username(), hashedPassword, userInfo.email());
         } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -68,6 +63,10 @@ public class SQLUserDAO implements UserDAO {
 
     public static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    public static boolean checkPassword(String password, String hash) {
+        return BCrypt.checkpw(password, hash);
     }
 
 

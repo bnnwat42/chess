@@ -1,5 +1,7 @@
 package dataaccess;
 
+import dataaccess.sqlImpementations.DatabaseManager;
+import dataaccess.sqlImpementations.SQLUserDAO;
 import exceptions.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
@@ -44,7 +46,10 @@ class SQLUserDAOTest {
     void getUser() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
         assertDoesNotThrow(() -> DAO.createUser(newUser));
-        assertEquals(newUser, DAO.getUser("Bob"));
+        var retrivedUse = DAO.getUser("Bob");
+        assertEquals(newUser.email(), retrivedUse.email());
+        assertEquals(newUser.username(), retrivedUse.username());
+        assertTrue(SQLUserDAO.checkPassword(newUser.password(), retrivedUse.password()));
     }
 
     @Test

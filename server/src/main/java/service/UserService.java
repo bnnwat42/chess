@@ -1,6 +1,9 @@
 package service;
 
-import dataaccess.*;
+import dataaccess.interfaces.AuthDAO;
+import dataaccess.interfaces.UserDAO;
+import dataaccess.memoryImplementations.MemoryAuthDAO;
+import dataaccess.memoryImplementations.MemoryUserDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;

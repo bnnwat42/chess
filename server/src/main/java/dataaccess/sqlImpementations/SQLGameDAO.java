@@ -1,14 +1,12 @@
-package dataaccess;
+package dataaccess.sqlImpementations;
 
+import dataaccess.interfaces.GameDAO;
 import exceptions.DataAccessException;
 import model.GameData;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
-
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class SQLGameDAO implements GameDAO {
 
@@ -35,28 +33,16 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public int createGame(GameData gameData) {
-            try (var conn = DatabaseManager.getConnection()) {
-                try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                    for (int i = 0; i < params.length; i++) {
-                        Object param = params[i];
-                        if (param instanceof String p) ps.setString(i + 1, p);
-                        else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                        else if (param instanceof PetType p) ps.setString(i + 1, p.toString());
-                        else if (param == null) ps.setNull(i + 1, NULL);
-                    }
-                    ps.executeUpdate();
-
-                    ResultSet rs = ps.getGeneratedKeys();
-                    if (rs.next()) {
-                        return rs.getInt(1);
-                    }
-
-                    return 0;
-                }
-            } catch (SQLException e) {
-                throw new ResponseException(ResponseException.Code.ServerError, String.format("unable to update database: %s, %s", statement, e.getMessage()));
-            }
+        String updateString = String.format("INSERT INTO games (gameID, gameData) VALUE (\"%s\", \"%s\");",
+                gameData.gameID(), gameData.game().toString()
+        );
+        System.out.println(gameData.game().toString());
+        try {
+            DatabaseManager.updateDatabase(updateString);
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
         }
+        return gameData.gameID();
     }
 
     @Override

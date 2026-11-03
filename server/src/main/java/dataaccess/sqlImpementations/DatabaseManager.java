@@ -1,4 +1,4 @@
-package dataaccess;
+package dataaccess.sqlImpementations;
 
 import exceptions.DataAccessException;
 
@@ -80,11 +80,14 @@ public class DatabaseManager {
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
 
-    public static void updateDatabase(String statement) throws DataAccessException, SQLException {
+    public static void updateDatabase(String sqlString, Object... params) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                preparedStatement.executeUpdate();
+            var statement = conn.prepareStatement(sqlString);
+
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
             }
+            statement.executeUpdate();
         }
     }
 

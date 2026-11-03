@@ -1,6 +1,6 @@
 package server;
 
-import dataaccess.DatabaseManager;
+import dataaccess.sqlImpementations.DatabaseManager;
 
 public class ServerMain {
     public static void main(String[] args) {

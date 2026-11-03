@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memoryImplementations;
 
+import dataaccess.interfaces.GameDAO;
 import model.GameData;
 
 import java.util.Collection;
