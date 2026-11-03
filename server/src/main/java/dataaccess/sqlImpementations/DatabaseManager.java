@@ -91,17 +91,21 @@ public class DatabaseManager {
         }
     }
 
-    public static ArrayList<Map<String, String>> retrieveFromDatabase(String statement) throws DataAccessException, SQLException {
+    public static ArrayList<Map<String, String>> retrieveFromDatabase(String retrieveStatement, Object... params) throws DataAccessException, SQLException {
         ArrayList<Map<String, String>> rows = new ArrayList<>();
 
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement(statement)) {
-                var rs = preparedStatement.executeQuery();
+            var statement = conn.prepareStatement(retrieveStatement);
+
+            for (int i = 0; i < params.length; i++) {
+                statement.setObject(i + 1, params[i]);
+            }
+            try (var rs = statement.executeQuery()) {
+                Map<String, String> row = new HashMap<>();
                 var metaData = rs.getMetaData();
                 int colCount = metaData.getColumnCount();
 
                 while (rs.next()) {
-                    Map<String, String> row = new HashMap<>();
                     for (int i = 1; i <= colCount; i++) {
                         String colName = metaData.getColumnName(i);
                         String str = rs.getString(i);

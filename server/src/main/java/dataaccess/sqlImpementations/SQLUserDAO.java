@@ -42,9 +42,9 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUser(String userName) {
         ArrayList<Map<String, String>> response;
-        String retrivalString = String.format("SELECT * FROM users WHERE username=\"%s\";", userName);
+        String retrivalString = "SELECT * FROM users WHERE username=?;";
         try {
-            response = DatabaseManager.retrieveFromDatabase(retrivalString);
+            response = DatabaseManager.retrieveFromDatabase(retrivalString, userName);
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
