@@ -26,8 +26,8 @@ class GameServiceTest {
     void setUp() {
         userService = new UserService();
         gameService = new GameService();
-        userService.clear();
-        gameService.clear();
+        assertDoesNotThrow(() -> userService.clear());
+        assertDoesNotThrow(() -> gameService.clear());
         testUser = new UserData("bob", "1234", "cosmo@byu.edu");
         testGame = new GameData(1, "", "", "GameName", new ChessGame());
         newAuth = assertDoesNotThrow(() -> userService.register(testUser));
@@ -46,11 +46,11 @@ class GameServiceTest {
         Collection<String> nameList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             CreateGameRequest newGameRequest = new CreateGameRequest(newAuth.authToken(), testGame.gameName() + Integer.valueOf(i).toString());
-            gameService.createGame(newGameRequest);
+            assertDoesNotThrow(() -> gameService.createGame(newGameRequest));
             nameList.add(newGameRequest.gameName());
         }
 
-        Collection<GameInfo> gameInfoList = gameService.listGames(newAuth.authToken());
+        Collection<GameInfo> gameInfoList = assertDoesNotThrow(() -> gameService.listGames(newAuth.authToken()));
         for (GameInfo game : gameInfoList) {
             assertTrue(nameList.contains(game.gameName()));
         }
@@ -60,7 +60,7 @@ class GameServiceTest {
     @Test
     void joinGame() {
         CreateGameRequest newGameRequest = new CreateGameRequest(newAuth.authToken(), testGame.gameName());
-        int gameID = gameService.createGame(newGameRequest);
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(newGameRequest));
 
         JoinGameRequest newRequest = new JoinGameRequest(newAuth.authToken(), ChessGame.TeamColor.WHITE, Integer.valueOf(gameID).toString());
         assertDoesNotThrow(() -> gameService.joinGame(newRequest));

@@ -4,6 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import exceptions.AlreadyTakenException;
 import exceptions.BadRequestException;
+import exceptions.DataAccessException;
 import io.javalin.http.Context;
 import service.CreateGameRequest;
 import service.GameInfo;
@@ -22,14 +23,14 @@ public class GameHandler {
         gameService = new GameService();
     }
 
-    public String listGames(Context ctx) {
+    public String listGames(Context ctx) throws DataAccessException {
         Collection<GameInfo> gameList = gameService.listGames(ctx.headerMap().get("Authorization"));
 
         String jsonGames = new Gson().toJson(Map.of("games", gameList));
         return jsonGames;
     }
 
-    public int createGame(Context ctx) {
+    public int createGame(Context ctx) throws DataAccessException {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, String> body = getBodyObject(ctx, Map.class);
         if (UserHandler.isMalformed(body.keySet(), new String[]{"gameName"})) {
@@ -48,7 +49,7 @@ public class GameHandler {
         return bodyObject;
     }
 
-    public void joinGame(Context ctx) throws AlreadyTakenException {
+    public void joinGame(Context ctx) throws AlreadyTakenException, DataAccessException {
         String authToken = ctx.headerMap().get("Authorization");
         Map<String, Object> body = getBodyObject(ctx, Map.class);
 

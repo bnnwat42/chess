@@ -1,7 +1,5 @@
-package dataaccess;
+package dataaccess.sqlImpementations;
 
-import dataaccess.sqlImpementations.DatabaseManager;
-import dataaccess.sqlImpementations.SQLUserDAO;
 import exceptions.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,7 +31,7 @@ class SQLUserDAOTest {
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-        DAO = new SQLUserDAO();
+        DAO = assertDoesNotThrow(() -> new SQLUserDAO());
     }
 
     @Test
@@ -46,17 +44,17 @@ class SQLUserDAOTest {
     void getUser() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
         assertDoesNotThrow(() -> DAO.createUser(newUser));
-        var retrivedUse = DAO.getUser("Bob");
-        assertEquals(newUser.email(), retrivedUse.email());
-        assertEquals(newUser.username(), retrivedUse.username());
-        assertTrue(SQLUserDAO.checkPassword(newUser.password(), retrivedUse.password()));
+        var retrievedUse = assertDoesNotThrow(() -> DAO.getUser("Bob"));
+        assertEquals(newUser.email(), retrievedUse.email());
+        assertEquals(newUser.username(), retrievedUse.username());
+        assertTrue(SQLUserDAO.checkPassword(newUser.password(), retrievedUse.password()));
     }
 
     @Test
     void clear() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
         assertDoesNotThrow(() -> DAO.createUser(newUser));
-        DAO.clear();
+        assertDoesNotThrow(() -> DAO.clear());
         assertThrows(NoSuchElementException.class, () -> DAO.getUser("Bob"));
     }
 }

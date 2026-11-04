@@ -6,6 +6,7 @@ import dataaccess.interfaces.GameDAO;
 import dataaccess.memoryImplementations.MemoryAuthDAO;
 import dataaccess.memoryImplementations.MemoryGameDAO;
 import exceptions.AlreadyTakenException;
+import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
@@ -24,7 +25,7 @@ public class GameService {
         authStorage = new MemoryAuthDAO();
     }
 
-    public Collection<GameInfo> listGames(String authToken) throws UnauthorizedException {
+    public Collection<GameInfo> listGames(String authToken) throws UnauthorizedException, DataAccessException {
         if (authStorage.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
@@ -35,17 +36,16 @@ public class GameService {
         return games;
     }
 
-    public int createGame(CreateGameRequest newGameRequest) throws UnauthorizedException {
+    public int createGame(CreateGameRequest newGameRequest) throws UnauthorizedException, DataAccessException {
         if (authStorage.getAuth(newGameRequest.authToken()) == null) {
             throw new UnauthorizedException();
         }
-        int newId = gameId++;
-        GameData newGame = new GameData(newId, null, null, newGameRequest.gameName(), new ChessGame());
+        GameData newGame = new GameData(0, null, null, newGameRequest.gameName(), new ChessGame());
 
         return gameStorage.createGame(newGame);
     }
 
-    public void joinGame(JoinGameRequest joinGameRequest) throws AlreadyTakenException {
+    public void joinGame(JoinGameRequest joinGameRequest) throws AlreadyTakenException, DataAccessException {
         if (authStorage.getAuth(joinGameRequest.authToken()) == null) {
             throw new UnauthorizedException();
         }

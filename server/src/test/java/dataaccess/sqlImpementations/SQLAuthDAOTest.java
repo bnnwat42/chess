@@ -22,7 +22,7 @@ class SQLAuthDAOTest {
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-        DAO = new SQLAuthDAO();
+        DAO = assertDoesNotThrow(SQLAuthDAO::new);
     }
 
     @BeforeAll
@@ -43,14 +43,15 @@ class SQLAuthDAOTest {
     @Test
     void getAuth() {
         AuthData newAuth = new AuthData("abc123", "Bob");
-        DAO.createAuth(newAuth);
-        assertEquals(newAuth, DAO.getAuth(newAuth.authToken()));
+        assertDoesNotThrow(() -> DAO.createAuth(newAuth));
+        var retrievedAuth = assertDoesNotThrow(() -> DAO.getAuth(newAuth.authToken()));
+        assertEquals(newAuth, retrievedAuth);
     }
 
     @Test
     void deleteAuth() {
         AuthData newAuth = new AuthData("abc123", "Bob");
-        DAO.createAuth(newAuth);
+        assertDoesNotThrow(() -> DAO.createAuth(newAuth));
         assertDoesNotThrow(() -> DAO.deleteAuth(newAuth.authToken()));
         assertThrows(RuntimeException.class, () -> DAO.getAuth(newAuth.authToken()));
     }
@@ -59,8 +60,9 @@ class SQLAuthDAOTest {
     void clear() {
         for (int i = 0; i < 5; i++) {
             AuthData newAuth = new AuthData(String.format("abc123%d", i), String.format("Bob%d", i));
-            DAO.createAuth(newAuth);
-            assertEquals(newAuth, DAO.getAuth(newAuth.authToken()));
+            assertDoesNotThrow(() -> DAO.createAuth(newAuth));
+            AuthData retrievedAuth = assertDoesNotThrow(() -> DAO.getAuth(newAuth.authToken()));
+            assertEquals(newAuth, retrievedAuth);
         }
         assertDoesNotThrow(() -> DAO.clear());
         for (int i = 0; i < 5; i++) {

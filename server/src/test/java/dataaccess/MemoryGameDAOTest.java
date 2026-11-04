@@ -22,13 +22,14 @@ class MemoryGameDAOTest {
 
     @Test
     void createGameAndGetGame() {
-        GameData newGame = new GameData(123, "White", "Black", "The Battle of the Centuries", new ChessGame());
+        GameData newGame = new GameData(0, "White", "Black", "The Battle of the Centuries", new ChessGame());
 
-        memoryStorage.createGame(newGame);
+        int realId = memoryStorage.createGame(newGame);
+        GameData realGame = new GameData(realId, "White", "Black", "The Battle of the Centuries", new ChessGame());
 
-        GameData returnedGame = memoryStorage.getGame(123);
+        GameData returnedGame = memoryStorage.getGame(realId);
 
-        assertEquals(123, returnedGame.gameID());
+        assertEquals(realId, returnedGame.gameID());
         assertEquals("White", returnedGame.whiteUsername());
         assertEquals("Black", returnedGame.blackUsername());
         assertEquals("The Battle of the Centuries", returnedGame.gameName());

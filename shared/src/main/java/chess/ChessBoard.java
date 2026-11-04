@@ -234,4 +234,36 @@ public class ChessBoard {
         //If it has no valid escapes and isn't in check, it is stalemated
         return !this.isInCheck(teamColor) && this.isSurrounded(teamColor);
     }
+
+    public String[][] serilizeBoard() {
+        int boardLength = board.length;
+        String[][] copy = new String[boardLength][boardLength];
+        for (int i = 0; i < boardLength; i++) {
+            for (int j = 0; j < boardLength; j++) {
+                ChessPiece pieceObject = board[i][j];
+                String pieceString = "";
+                if (pieceObject == null) {
+                    copy[i][j] = pieceString;
+                    continue;
+                }
+                switch (pieceObject.getPieceType()) {
+                    case KNIGHT -> pieceString = "N";
+                    case BISHOP -> pieceString = "B";
+                    case ROOK -> pieceString = "R";
+                    case QUEEN -> pieceString = "Q";
+                    case PAWN -> pieceString = "P";
+                    case KING -> pieceString = "K";
+                }
+                if (pieceObject.getTeamColor() == WHITE) {
+                    pieceString = pieceString.toLowerCase();
+                }
+                copy[i][j] = pieceString;
+            }
+        }
+        return copy;
+    }
+
+    public void clearBoard() {
+        board = new ChessPiece[8][8];
+    }
 }

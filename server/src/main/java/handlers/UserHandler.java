@@ -20,7 +20,7 @@ public class UserHandler {
         userService = new UserService();
     }
 
-    public String registerUser(Context ctx) throws AlreadyTakenException, BadRequestException {
+    public String registerUser(Context ctx) throws AlreadyTakenException, BadRequestException, DataAccessException {
         Map<String, String> body = getBodyObject(ctx, Map.class);
 
         Set<String> keys = body.keySet();

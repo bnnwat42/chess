@@ -9,6 +9,7 @@ import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.*;
 
+import javax.xml.crypto.Data;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class UserService {
         authAccess = new MemoryAuthDAO();
     }
 
-    public AuthData register(UserData newUser) throws AlreadyTakenException {
+    public AuthData register(UserData newUser) throws AlreadyTakenException, DataAccessException {
         userAccess.createUser(newUser);
         return createNewAuth(newUser);
     }
@@ -38,13 +39,13 @@ public class UserService {
         return createNewAuth(loginRequest);
     }
 
-    private AuthData createNewAuth(UserData userData) {
+    private AuthData createNewAuth(UserData userData) throws DataAccessException {
         AuthData newUserAuth = new AuthData(generateToken(), userData.username());
         authAccess.createAuth(newUserAuth);
         return newUserAuth;
     }
 
-    public void logout(String authToken) throws UnauthorizedException {
+    public void logout(String authToken) throws UnauthorizedException, DataAccessException {
         if (authAccess.getAuth(authToken) == null) {
             throw new UnauthorizedException();
         }
@@ -52,7 +53,7 @@ public class UserService {
         authAccess.deleteAuth(authToken);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         userAccess.clear();
         authAccess.clear();
     }

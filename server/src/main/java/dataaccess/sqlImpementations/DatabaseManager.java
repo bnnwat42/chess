@@ -80,16 +80,25 @@ public class DatabaseManager {
         connectionUrl = String.format("jdbc:mysql://%s:%d", host, port);
     }
 
-    public static void updateDatabase(String sqlString, Object... params) throws DataAccessException, SQLException {
+    public static String updateDatabase(String sqlString, Object... params) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = conn.prepareStatement(sqlString);
+            var statement = conn.prepareStatement(sqlString,
+                    Statement.RETURN_GENERATED_KEYS);
 
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);
             }
             statement.executeUpdate();
+
+            try (var rs = statement.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getString(1);
+                }
+            }
         }
+        return null;
     }
+
 
     public static ArrayList<Map<String, String>> retrieveFromDatabase(String retrieveStatement, Object... params) throws DataAccessException, SQLException {
         ArrayList<Map<String, String>> rows = new ArrayList<>();
@@ -101,11 +110,11 @@ public class DatabaseManager {
                 statement.setObject(i + 1, params[i]);
             }
             try (var rs = statement.executeQuery()) {
-                Map<String, String> row = new HashMap<>();
                 var metaData = rs.getMetaData();
                 int colCount = metaData.getColumnCount();
 
                 while (rs.next()) {
+                    Map<String, String> row = new HashMap<>();
                     for (int i = 1; i <= colCount; i++) {
                         String colName = metaData.getColumnName(i);
                         String str = rs.getString(i);

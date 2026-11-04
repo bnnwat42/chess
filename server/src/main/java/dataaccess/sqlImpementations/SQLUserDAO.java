@@ -12,52 +12,50 @@ import java.util.Map;
 
 public class SQLUserDAO implements UserDAO {
 
-    public SQLUserDAO() {
+    public SQLUserDAO() throws DataAccessException {
 
-        var createPetTable = "CREATE TABLE IF NOT EXISTS users (" +
+        var createUserTable = "CREATE TABLE IF NOT EXISTS users (" +
                 "username VARCHAR(255) NOT NULL PRIMARY KEY," +
                 "password VARCHAR(255) NOT NULL," +
                 "email VARCHAR(255) NOT NULL);";
 
         try {
-            DatabaseManager.updateDatabase(createPetTable);
-        } catch (DataAccessException ex) {
-            throw new RuntimeException(ex);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+            DatabaseManager.updateDatabase(createUserTable);
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public void createUser(UserData userInfo) throws AlreadyTakenException {
+    public void createUser(UserData userInfo) throws AlreadyTakenException, DataAccessException {
         String updateString = "INSERT INTO users (username, password, email) VALUE (?, ?, ?);";
         String hashedPassword = hashPassword(userInfo.password());
         try {
             DatabaseManager.updateDatabase(updateString, userInfo.username(), hashedPassword, userInfo.email());
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
     @Override
-    public UserData getUser(String userName) {
+    public UserData getUser(String userName) throws DataAccessException {
         ArrayList<Map<String, String>> response;
         String retrivalString = "SELECT * FROM users WHERE username=?;";
         try {
             response = DatabaseManager.retrieveFromDatabase(retrivalString, userName);
-        } catch (DataAccessException | SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException(e.getMessage());
         }
         Map<String, String> userMap = response.getFirst();
         return new UserData(userMap.get("username"), userMap.get("password"), userMap.get("email"));
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         try {
             DatabaseManager.updateDatabase("TRUNCATE TABLE users");
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
