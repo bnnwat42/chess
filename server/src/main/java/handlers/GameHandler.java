@@ -80,7 +80,7 @@ public class GameHandler {
         }
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameService.clear();
     }
 

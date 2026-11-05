@@ -17,6 +17,7 @@ class SQLAuthDAOTest {
     @BeforeEach
     void clearTable() {
         try {
+            DatabaseManager.createDatabase();
             DatabaseManager.updateDatabase("DROP TABLE IF EXISTS authTokens");
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
@@ -24,19 +25,34 @@ class SQLAuthDAOTest {
         DAO = assertDoesNotThrow(SQLAuthDAO::new);
     }
 
-    @BeforeAll
-    static void createDatabase() {
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    void constructor() {
+        assertDoesNotThrow(() -> DAO.clear());
+        DAO = assertDoesNotThrow(SQLAuthDAO::new);
+        assertDoesNotThrow(() -> DAO.clear());
+    }
+
+    void dropDatabase() {
+        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP DATABASE CHESS;"));
+    }
+
+    @Test
+    void constructorNoDatabase() {
+        dropDatabase();
+        assertThrows(DataAccessException.class, SQLAuthDAO::new);
     }
 
     @Test
     void createAuth() {
         AuthData newAuth = new AuthData("abc123", "Bob");
         assertDoesNotThrow(() -> DAO.createAuth(newAuth));
+    }
+
+    @Test
+    void authNoDatabase() {
+        dropDatabase();
+        AuthData newAuth = new AuthData("abc123", "Bob");
+        assertThrows(DataAccessException.class, () -> DAO.createAuth(newAuth));
     }
 
     @Test
@@ -48,11 +64,23 @@ class SQLAuthDAOTest {
     }
 
     @Test
+    void getNoDatabase() {
+        dropDatabase();
+        assertThrows(DataAccessException.class, () -> DAO.getAuth("abc"));
+    }
+
+    @Test
     void deleteAuth() {
         AuthData newAuth = new AuthData("abc123", "Bob");
         assertDoesNotThrow(() -> DAO.createAuth(newAuth));
         assertDoesNotThrow(() -> DAO.deleteAuth(newAuth.authToken()));
         assertThrows(RuntimeException.class, () -> DAO.getAuth(newAuth.authToken()));
+    }
+
+    @Test
+    void deleteNoDatabase() {
+        dropDatabase();
+        assertThrows(DataAccessException.class, () -> DAO.deleteAuth("abc"));
     }
 
     @Test
@@ -68,5 +96,11 @@ class SQLAuthDAOTest {
             AuthData newAuth = new AuthData(String.format("abc123%d", i), String.format("Bob%d", i));
             assertThrows(RuntimeException.class, () -> DAO.getAuth(newAuth.authToken()));
         }
+    }
+
+    @Test
+    void clearNoDatabase() {
+        dropDatabase();
+        assertThrows(DataAccessException.class, () -> DAO.clear());
     }
 }

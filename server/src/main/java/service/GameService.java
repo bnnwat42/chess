@@ -72,7 +72,7 @@ public class GameService {
         gameStorage.updateGame(newGame);
     }
 
-    public void clear() {
+    public void clear() throws DataAccessException {
         gameStorage.clear();
     }
 }

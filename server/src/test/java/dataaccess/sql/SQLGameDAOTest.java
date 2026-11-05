@@ -22,20 +22,12 @@ class SQLGameDAOTest {
     @BeforeEach
     void setup() {
         try {
+            DatabaseManager.createDatabase();
             DatabaseManager.updateDatabase("DROP TABLE IF EXISTS games");
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
         DAO = assertDoesNotThrow(() -> new SQLGameDAO());
-    }
-
-    @BeforeAll
-    static void createDatabase() {
-        try {
-            DatabaseManager.createDatabase();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Test
@@ -45,6 +37,16 @@ class SQLGameDAOTest {
         GameData realGame = new GameData(realID, null, null, "myName", new ChessGame());
         GameData retrievedGame = assertDoesNotThrow(() -> DAO.getGame(realID));
         assertEquals(realGame, retrievedGame);
+    }
+
+    @Test
+    void noDatabase() {
+        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP DATABASE CHESS;"));
+        assertThrows(DataAccessException.class, () -> DAO.createGame(new GameData(1, "2", "3", "4", new ChessGame())));
+        assertThrows(DataAccessException.class, () -> DAO.clear());
+        assertThrows(DataAccessException.class, () -> DAO.getGame(1));
+        assertThrows(DataAccessException.class, () -> DAO.listGames());
+        assertThrows(DataAccessException.class, () -> DAO.updateGame(new GameData(1, "2", "3", "4", new ChessGame())));
     }
 
     @Test
@@ -82,7 +84,7 @@ class SQLGameDAOTest {
         GameData newGame = new GameData(1, "white", "black", "gameName", new ChessGame());
         int gameId;
         assertDoesNotThrow(() -> DAO.createGame(newGame));
-        DAO.clear();
+        assertDoesNotThrow(() -> DAO.clear());
         assertThrows(NoSuchElementException.class, () -> DAO.getGame(1));
     }
 }

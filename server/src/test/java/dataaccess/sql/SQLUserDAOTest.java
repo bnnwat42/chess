@@ -1,6 +1,8 @@
 package dataaccess.sql;
 
+import chess.ChessGame;
 import exceptions.DataAccessException;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,11 +29,20 @@ class SQLUserDAOTest {
     @BeforeEach
     void clearTable() {
         try {
+            DatabaseManager.createDatabase();
             DatabaseManager.updateDatabase("DROP TABLE IF EXISTS users");
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
         DAO = assertDoesNotThrow(() -> new SQLUserDAO());
+    }
+
+    @Test
+    void noDatabase() {
+        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP DATABASE CHESS;"));
+        assertThrows(DataAccessException.class, () -> DAO.createUser(new UserData("1", "2", "3")));
+        assertThrows(DataAccessException.class, () -> DAO.clear());
+        assertThrows(DataAccessException.class, () -> DAO.getUser("Bob"));
     }
 
     @Test

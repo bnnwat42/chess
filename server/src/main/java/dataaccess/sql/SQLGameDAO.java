@@ -24,9 +24,7 @@ public class SQLGameDAO implements GameDAO {
                 "gameData TEXT NOT NULL);";
         try {
             DatabaseManager.updateDatabase(createGameTable);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (DataAccessException e) {
+        } catch (SQLException | DataAccessException e) {
             throw new RuntimeException(e);
         }
     }
@@ -92,11 +90,11 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         try {
             DatabaseManager.updateDatabase("TRUNCATE TABLE games");
         } catch (SQLException | DataAccessException e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(e.getMessage());
         }
     }
 
