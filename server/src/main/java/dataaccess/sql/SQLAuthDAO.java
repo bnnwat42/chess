@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 public class SQLAuthDAO implements AuthDAO {
 
     public SQLAuthDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
         var createAuthTable = "CREATE TABLE IF NOT EXISTS authTokens (" +
                 "authToken VARCHAR(255) NOT NULL PRIMARY KEY," +
                 "username VARCHAR(255) NOT NULL);";

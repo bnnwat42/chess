@@ -37,12 +37,6 @@ class SQLAuthDAOTest {
     }
 
     @Test
-    void constructorNoDatabase() {
-        dropDatabase();
-        assertThrows(DataAccessException.class, SQLAuthDAO::new);
-    }
-
-    @Test
     void createAuth() {
         AuthData newAuth = new AuthData("abc123", "Bob");
         assertDoesNotThrow(() -> DAO.createAuth(newAuth));

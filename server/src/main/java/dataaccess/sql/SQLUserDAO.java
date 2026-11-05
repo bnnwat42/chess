@@ -14,7 +14,7 @@ import java.util.NoSuchElementException;
 public class SQLUserDAO implements UserDAO {
 
     public SQLUserDAO() throws DataAccessException {
-
+        DatabaseManager.createDatabase();
         var createUserTable = "CREATE TABLE IF NOT EXISTS users (" +
                 "username VARCHAR(255) NOT NULL PRIMARY KEY," +
                 "password VARCHAR(255) NOT NULL," +

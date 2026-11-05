@@ -14,8 +14,8 @@ import java.util.*;
 
 public class SQLGameDAO implements GameDAO {
 
-    public SQLGameDAO() {
-
+    public SQLGameDAO() throws DataAccessException {
+        DatabaseManager.createDatabase();
         var createGameTable = "CREATE TABLE IF NOT EXISTS games (" +
                 "gameID INT NOT NULL AUTO_INCREMENT PRIMARY KEY ," +
                 "whiteUsername VARCHAR(255)," +
