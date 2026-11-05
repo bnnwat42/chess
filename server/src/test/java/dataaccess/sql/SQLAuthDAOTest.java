@@ -1,6 +1,5 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
-import dataaccess.interfaces.AuthDAO;
 import exceptions.DataAccessException;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeAll;

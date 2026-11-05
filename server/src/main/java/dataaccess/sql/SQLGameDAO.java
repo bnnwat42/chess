@@ -1,18 +1,14 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializer;
 import dataaccess.interfaces.GameDAO;
 import exceptions.DataAccessException;
-import model.AuthData;
 import model.GameData;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.*;
 

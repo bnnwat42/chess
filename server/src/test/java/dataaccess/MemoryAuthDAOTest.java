@@ -1,6 +1,5 @@
 package dataaccess;
 
-import dataaccess.memoryImplementations.MemoryAuthDAO;
 import model.AuthData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

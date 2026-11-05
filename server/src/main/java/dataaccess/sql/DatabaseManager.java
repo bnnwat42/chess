@@ -1,4 +1,4 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
 import exceptions.DataAccessException;
 

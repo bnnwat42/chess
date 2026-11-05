@@ -1,4 +1,4 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
 import exceptions.DataAccessException;
 import model.UserData;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 

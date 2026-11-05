@@ -2,18 +2,14 @@ package service;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.UserDAO;
-import dataaccess.memoryImplementations.MemoryAuthDAO;
-import dataaccess.memoryImplementations.MemoryUserDAO;
-import dataaccess.sqlImpementations.SQLAuthDAO;
-import dataaccess.sqlImpementations.SQLUserDAO;
+import dataaccess.sql.SQLAuthDAO;
+import dataaccess.sql.SQLUserDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
-import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {

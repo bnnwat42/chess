@@ -1,4 +1,4 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
 import chess.ChessGame;
 import chess.ChessMove;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.NoSuchElementException;
 

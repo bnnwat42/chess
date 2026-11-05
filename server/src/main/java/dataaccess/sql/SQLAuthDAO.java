@@ -1,10 +1,9 @@
-package dataaccess.sqlImpementations;
+package dataaccess.sql;
 
 import dataaccess.interfaces.AuthDAO;
 import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
-import model.UserData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

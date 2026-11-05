@@ -1,4 +1,4 @@
-package dataaccess.memoryImplementations;
+package dataaccess;
 
 import dataaccess.interfaces.UserDAO;
 import exceptions.AlreadyTakenException;
