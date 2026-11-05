@@ -5,6 +5,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.NoSuchElementException;
@@ -47,7 +48,7 @@ class SQLUserDAOTest {
         var retrievedUse = assertDoesNotThrow(() -> DAO.getUser("Bob"));
         assertEquals(newUser.email(), retrievedUse.email());
         assertEquals(newUser.username(), retrievedUse.username());
-        assertTrue(SQLUserDAO.checkPassword(newUser.password(), retrievedUse.password()));
+        assertTrue(BCrypt.checkpw(newUser.password(), retrievedUse.password()));
     }
 
     @Test
@@ -55,6 +56,6 @@ class SQLUserDAOTest {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
         assertDoesNotThrow(() -> DAO.createUser(newUser));
         assertDoesNotThrow(() -> DAO.clear());
-        assertThrows(NoSuchElementException.class, () -> DAO.getUser("Bob"));
+        assertNull(assertDoesNotThrow(() -> DAO.getUser("Bob")));
     }
 }

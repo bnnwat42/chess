@@ -2,12 +2,14 @@ package dataaccess.sqlImpementations;
 
 import dataaccess.interfaces.AuthDAO;
 import exceptions.DataAccessException;
+import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.UserData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class SQLAuthDAO implements AuthDAO {
 
@@ -42,8 +44,12 @@ public class SQLAuthDAO implements AuthDAO {
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }
-        Map<String, String> userMap = response.getFirst();
-        return new AuthData(userMap.get("authToken"), userMap.get("username"));
+        try {
+            Map<String, String> userMap = response.getFirst();
+            return new AuthData(userMap.get("authToken"), userMap.get("username"));
+        } catch (NoSuchElementException e) {
+            throw new UnauthorizedException();
+        }
     }
 
     @Override

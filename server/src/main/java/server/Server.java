@@ -1,5 +1,6 @@
 package server;
 
+import exceptions.DataAccessException;
 import handlers.GameHandler;
 import handlers.UserHandler;
 import com.google.gson.Gson;
@@ -16,13 +17,12 @@ import java.util.Map;
 public class Server {
 
     private final Javalin javalinObj;
-    private final UserHandler userHandler;
-    private final GameHandler gameHandler;
+    private UserHandler userHandler;
+    private GameHandler gameHandler;
 
     public Server() {
-        userHandler = new UserHandler();
-        gameHandler = new GameHandler();
         javalinObj = Javalin.create(config -> config.staticFiles.add("web"));
+        this.createHandlers();
 
         // Register your endpoints and exception handlers here.
         javalinObj.delete("/db", context -> clearDatabase(context));
@@ -32,6 +32,23 @@ public class Server {
         javalinObj.get("/game", context -> listGames(context));
         javalinObj.post("/game", context -> createGame(context));
         javalinObj.put("/game", context -> joinGame(context));
+    }
+
+    private void createHandlers() {
+        try {
+            userHandler = new UserHandler();
+            gameHandler = new GameHandler();
+        } catch (DataAccessException e) {
+            // Log the error and rethrow or handle gracefully
+            System.err.println("Failed to initialize handlers: " + e.getMessage());
+            throw new RuntimeException("Failed to initialize database handlers", e);
+        }
+
+        // Register exception handler for DataAccessException
+        javalinObj.exception(DataAccessException.class, (exception, context) -> {
+            context.status(500);
+            context.result("Failed to initialize table");
+        });
     }
 
     private void joinGame(@NotNull Context ctx) {

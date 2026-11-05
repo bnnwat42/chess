@@ -5,6 +5,8 @@ import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.memoryImplementations.MemoryAuthDAO;
 import dataaccess.memoryImplementations.MemoryGameDAO;
+import dataaccess.sqlImpementations.SQLAuthDAO;
+import dataaccess.sqlImpementations.SQLGameDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
@@ -18,11 +20,12 @@ public class GameService {
 
     private final GameDAO gameStorage;
     private final AuthDAO authStorage;
-    private int gameId = 1;
 
-    public GameService() {
-        gameStorage = new MemoryGameDAO();
-        authStorage = new MemoryAuthDAO();
+    public GameService() throws DataAccessException {
+        //gameStorage = new MemoryGameDAO();
+        gameStorage = new SQLGameDAO();
+        //authStorage = new MemoryAuthDAO();
+        authStorage = new SQLAuthDAO();
     }
 
     public Collection<GameInfo> listGames(String authToken) throws UnauthorizedException, DataAccessException {

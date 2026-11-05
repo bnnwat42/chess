@@ -41,10 +41,11 @@ class MemoryGameDAOTest {
         HashSet<GameData> chessGames = new HashSet<>();
         int dummyId = 100;
 
+        int[] ids = new int[10];
         for (int i = 0; i < 10; i++) {
             GameData newGame = new GameData(dummyId++, Integer.toString(dummyId++), Integer.toString(dummyId++), Integer.toString(dummyId++), new ChessGame());
-            chessGames.add(newGame);
-            memoryStorage.createGame(newGame);
+            ids[i] = memoryStorage.createGame(newGame);
+            chessGames.add(new GameData(newGame, ids[i]));
         }
 
         HashSet<GameData> returnedGames = new HashSet<>();

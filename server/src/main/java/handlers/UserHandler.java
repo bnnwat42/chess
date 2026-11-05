@@ -16,7 +16,7 @@ public class UserHandler {
 
     private final UserService userService;
 
-    public UserHandler() {
+    public UserHandler() throws DataAccessException {
         userService = new UserService();
     }
 

@@ -16,7 +16,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setUp() {
-        myLogin = new UserService();
+        myLogin = assertDoesNotThrow(() -> new UserService());
         assertDoesNotThrow(() -> myLogin.clear());
         testUser = new UserData("Bob", "1234", "cosmo@byu.edu");
     }

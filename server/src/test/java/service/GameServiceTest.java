@@ -24,8 +24,8 @@ class GameServiceTest {
 
     @BeforeEach
     void setUp() {
-        userService = new UserService();
-        gameService = new GameService();
+        userService = assertDoesNotThrow(() -> new UserService());
+        gameService = assertDoesNotThrow(() -> new GameService());
         assertDoesNotThrow(() -> userService.clear());
         assertDoesNotThrow(() -> gameService.clear());
         testUser = new UserData("bob", "1234", "cosmo@byu.edu");
@@ -61,9 +61,16 @@ class GameServiceTest {
     void joinGame() {
         CreateGameRequest newGameRequest = new CreateGameRequest(newAuth.authToken(), testGame.gameName());
         int gameID = assertDoesNotThrow(() -> gameService.createGame(newGameRequest));
+        System.out.println("Created game with ID: " + gameID);
 
         JoinGameRequest newRequest = new JoinGameRequest(newAuth.authToken(), ChessGame.TeamColor.WHITE, Integer.valueOf(gameID).toString());
         assertDoesNotThrow(() -> gameService.joinGame(newRequest));
-        assertThrows(AlreadyTakenException.class, () -> gameService.joinGame(newRequest));
+        System.out.println("First join successful");
+
+        assertThrows(AlreadyTakenException.class, () -> {
+            System.out.println("Attempting second join...");
+            gameService.joinGame(newRequest);
+        });
     }
+
 }

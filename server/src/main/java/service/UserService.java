@@ -4,10 +4,13 @@ import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.memoryImplementations.MemoryAuthDAO;
 import dataaccess.memoryImplementations.MemoryUserDAO;
+import dataaccess.sqlImpementations.SQLAuthDAO;
+import dataaccess.sqlImpementations.SQLUserDAO;
 import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 import java.util.Objects;
@@ -18,9 +21,11 @@ public class UserService {
     private final UserDAO userAccess;
     private final AuthDAO authAccess;
 
-    public UserService() {
-        userAccess = new MemoryUserDAO();
-        authAccess = new MemoryAuthDAO();
+    public UserService() throws DataAccessException {
+        //userAccess = new MemoryUserDAO();
+        userAccess = new SQLUserDAO();
+        //authAccess = new MemoryAuthDAO();
+        authAccess = new SQLAuthDAO();
     }
 
     public AuthData register(UserData newUser) throws AlreadyTakenException, DataAccessException {
@@ -32,7 +37,7 @@ public class UserService {
         UserData user = userAccess.getUser(loginRequest.username());
         if (user == null) {
             throw new UnauthorizedException();
-        } else if (!Objects.equals(user.password(), loginRequest.password())) {
+        } else if (!BCrypt.checkpw(loginRequest.password(), user.password())) {
             throw new UnauthorizedException();
         }
 

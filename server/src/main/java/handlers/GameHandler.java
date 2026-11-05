@@ -19,7 +19,7 @@ public class GameHandler {
 
     private final GameService gameService;
 
-    public GameHandler() {
+    public GameHandler() throws DataAccessException {
         gameService = new GameService();
     }
 

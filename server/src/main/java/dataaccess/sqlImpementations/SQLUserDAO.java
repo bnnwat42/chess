@@ -9,6 +9,7 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class SQLUserDAO implements UserDAO {
 
@@ -33,7 +34,7 @@ public class SQLUserDAO implements UserDAO {
         try {
             DatabaseManager.updateDatabase(updateString, userInfo.username(), hashedPassword, userInfo.email());
         } catch (SQLException | DataAccessException e) {
-            throw new DataAccessException(e.getMessage());
+            throw new AlreadyTakenException();
         }
     }
 
@@ -46,8 +47,12 @@ public class SQLUserDAO implements UserDAO {
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }
-        Map<String, String> userMap = response.getFirst();
-        return new UserData(userMap.get("username"), userMap.get("password"), userMap.get("email"));
+        try {
+            Map<String, String> userMap = response.getFirst();
+            return new UserData(userMap.get("username"), userMap.get("password"), userMap.get("email"));
+        } catch (NoSuchElementException e) {
+            return null;
+        }
     }
 
     @Override
@@ -62,10 +67,4 @@ public class SQLUserDAO implements UserDAO {
     public static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
-
-    public static boolean checkPassword(String password, String hash) {
-        return BCrypt.checkpw(password, hash);
-    }
-
-
 }
