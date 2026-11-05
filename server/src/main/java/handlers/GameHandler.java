@@ -32,26 +32,16 @@ public class GameHandler {
 
     public int createGame(Context ctx) throws DataAccessException {
         String authToken = ctx.headerMap().get("Authorization");
-        Map<String, String> body = getBodyObject(ctx, Map.class);
+        Map<String, String> body = BodyHandler.getBodyObject(ctx, Map.class);
         if (UserHandler.isMalformed(body.keySet(), new String[]{"gameName"})) {
             throw new BadRequestException();
         }
         return gameService.createGame(new CreateGameRequest(authToken, body.get("gameName")));
     }
 
-    private static <T> T getBodyObject(Context context, Class<T> clazz) {
-        var bodyObject = new Gson().fromJson(context.body(), clazz);
-
-        if (bodyObject == null) {
-            throw new RuntimeException("missing required body");
-        }
-
-        return bodyObject;
-    }
-
     public void joinGame(Context ctx) throws AlreadyTakenException, DataAccessException {
         String authToken = ctx.headerMap().get("Authorization");
-        Map<String, Object> body = getBodyObject(ctx, Map.class);
+        Map<String, Object> body = BodyHandler.getBodyObject(ctx, Map.class);
 
         if (UserHandler.isMalformed(body.keySet(), new String[]{"playerColor", "gameID"})) {
             throw new BadRequestException();

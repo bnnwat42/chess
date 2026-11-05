@@ -7,6 +7,7 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -33,6 +34,8 @@ public class SQLUserDAO implements UserDAO {
         String hashedPassword = hashPassword(userInfo.password());
         try {
             DatabaseManager.updateDatabase(updateString, userInfo.username(), hashedPassword, userInfo.email());
+        } catch (SQLSyntaxErrorException e) {
+            throw new DataAccessException(e.getMessage());
         } catch (SQLException e) {
             throw new AlreadyTakenException();
         }
@@ -43,7 +46,7 @@ public class SQLUserDAO implements UserDAO {
         ArrayList<Map<String, String>> response;
         String retrivalString = "SELECT * FROM users WHERE username=?;";
         try {
-            response = DatabaseManager.retrieveFromDatabase(retrivalString, userName);
+            response = DatabaseManager.getFromDatabase(retrivalString, userName);
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }

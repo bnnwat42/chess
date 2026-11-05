@@ -24,7 +24,7 @@ public class DatabaseManager {
     /**
      * Creates the database if it does not already exist.
      */
-    static public void createDatabase() throws DataAccessException {
+    static public String createDatabase() throws DataAccessException {
         var statement = "CREATE DATABASE IF NOT EXISTS " + databaseName;
         try (var conn = DriverManager.getConnection(connectionUrl, dbUsername, dbPassword);
              var preparedStatement = conn.prepareStatement(statement)) {
@@ -32,6 +32,7 @@ public class DatabaseManager {
         } catch (SQLException ex) {
             throw new DataAccessException("failed to create database", ex);
         }
+        return databaseName;
     }
 
     /**
@@ -100,11 +101,11 @@ public class DatabaseManager {
     }
 
 
-    public static ArrayList<Map<String, String>> retrieveFromDatabase(String retrieveStatement, Object... params) throws DataAccessException, SQLException {
+    public static ArrayList<Map<String, String>> getFromDatabase(String rStatement, Object... params) throws DataAccessException, SQLException {
         ArrayList<Map<String, String>> rows = new ArrayList<>();
 
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = conn.prepareStatement(retrieveStatement);
+            var statement = conn.prepareStatement(rStatement);
 
             for (int i = 0; i < params.length; i++) {
                 statement.setObject(i + 1, params[i]);

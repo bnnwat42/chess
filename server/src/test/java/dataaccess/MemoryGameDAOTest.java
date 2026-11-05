@@ -42,7 +42,8 @@ class MemoryGameDAOTest {
 
         int[] ids = new int[10];
         for (int i = 0; i < 10; i++) {
-            GameData newGame = new GameData(dummyId++, Integer.toString(dummyId++), Integer.toString(dummyId++), Integer.toString(dummyId++), new ChessGame());
+            GameData newGame = new GameData(dummyId++, Integer.toString(dummyId++),
+                    Integer.toString(dummyId++), Integer.toString(dummyId++), new ChessGame());
             ids[i] = memoryStorage.createGame(newGame);
             chessGames.add(new GameData(newGame, ids[i]));
         }

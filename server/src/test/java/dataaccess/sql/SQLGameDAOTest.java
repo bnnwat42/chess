@@ -5,7 +5,6 @@ import chess.ChessMove;
 import chess.ChessPosition;
 import exceptions.DataAccessException;
 import model.GameData;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SQLGameDAOTest {
 
-    SQLGameDAO DAO;
+    SQLGameDAO dao;
 
     @BeforeEach
     void setup() {
@@ -27,26 +26,26 @@ class SQLGameDAOTest {
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-        DAO = assertDoesNotThrow(() -> new SQLGameDAO());
+        dao = assertDoesNotThrow(() -> new SQLGameDAO());
     }
 
     @Test
     void createandGetGame() {
         GameData newGame = new GameData(0, null, null, "myName", new ChessGame());
-        int realID = assertDoesNotThrow(() -> DAO.createGame(newGame));
+        int realID = assertDoesNotThrow(() -> dao.createGame(newGame));
         GameData realGame = new GameData(realID, null, null, "myName", new ChessGame());
-        GameData retrievedGame = assertDoesNotThrow(() -> DAO.getGame(realID));
+        GameData retrievedGame = assertDoesNotThrow(() -> dao.getGame(realID));
         assertEquals(realGame, retrievedGame);
     }
 
     @Test
     void noDatabase() {
-        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP DATABASE CHESS;"));
-        assertThrows(DataAccessException.class, () -> DAO.createGame(new GameData(1, "2", "3", "4", new ChessGame())));
-        assertThrows(DataAccessException.class, () -> DAO.clear());
-        assertThrows(DataAccessException.class, () -> DAO.getGame(1));
-        assertThrows(DataAccessException.class, () -> DAO.listGames());
-        assertThrows(DataAccessException.class, () -> DAO.updateGame(new GameData(1, "2", "3", "4", new ChessGame())));
+        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP TABLE games;"));
+        assertThrows(DataAccessException.class, () -> dao.createGame(new GameData(1, "2", "3", "4", new ChessGame())));
+        assertThrows(DataAccessException.class, () -> dao.clear());
+        assertThrows(DataAccessException.class, () -> dao.getGame(1));
+        assertThrows(DataAccessException.class, () -> dao.listGames());
+        assertThrows(DataAccessException.class, () -> dao.updateGame(new GameData(1, "2", "3", "4", new ChessGame())));
     }
 
     @Test
@@ -54,10 +53,10 @@ class SQLGameDAOTest {
         int[] ids = new int[10];
         for (int i = 0; i < ids.length; i++) {
             GameData newGame = new GameData(0, null, null, "myName", new ChessGame());
-            int realID = assertDoesNotThrow(() -> DAO.createGame(newGame));
+            int realID = assertDoesNotThrow(() -> dao.createGame(newGame));
             ids[i] = realID;
         }
-        Collection<GameData> games = assertDoesNotThrow(() -> DAO.listGames());
+        Collection<GameData> games = assertDoesNotThrow(() -> dao.listGames());
         for (int id : ids) {
             GameData realGame = new GameData(id, null, null, "myName", new ChessGame());
             assertTrue(games.contains(realGame));
@@ -67,14 +66,14 @@ class SQLGameDAOTest {
     @Test
     void updateGame() {
         GameData newGame = new GameData(0, null, null, "myName", new ChessGame());
-        int realID = assertDoesNotThrow(() -> DAO.createGame(newGame));
+        int realID = assertDoesNotThrow(() -> dao.createGame(newGame));
         GameData realGame = new GameData(realID, null, null, "myName", new ChessGame());
         ChessMove fakeMove = new ChessMove(new ChessPosition(2, 2), new ChessPosition(3, 2), null);
         ChessGame fakeGame = new ChessGame();
         assertDoesNotThrow(() -> fakeGame.makeMove(fakeMove));
         GameData updatedGame = new GameData(realID, "whiteGuy", "blackGuy", "gameName", fakeGame);
-        assertDoesNotThrow(() -> DAO.updateGame(updatedGame));
-        GameData retrievedGame = assertDoesNotThrow(() -> DAO.getGame(realID));
+        assertDoesNotThrow(() -> dao.updateGame(updatedGame));
+        GameData retrievedGame = assertDoesNotThrow(() -> dao.getGame(realID));
         assertEquals(updatedGame, retrievedGame);
         assertNotEquals(realGame, retrievedGame);
     }
@@ -83,8 +82,8 @@ class SQLGameDAOTest {
     void clear() {
         GameData newGame = new GameData(1, "white", "black", "gameName", new ChessGame());
         int gameId;
-        assertDoesNotThrow(() -> DAO.createGame(newGame));
-        assertDoesNotThrow(() -> DAO.clear());
-        assertThrows(NoSuchElementException.class, () -> DAO.getGame(1));
+        assertDoesNotThrow(() -> dao.createGame(newGame));
+        assertDoesNotThrow(() -> dao.clear());
+        assertThrows(NoSuchElementException.class, () -> dao.getGame(1));
     }
 }

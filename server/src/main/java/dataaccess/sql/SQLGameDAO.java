@@ -46,7 +46,7 @@ public class SQLGameDAO implements GameDAO {
         String retrivalString = "SELECT * FROM games WHERE gameID = ?;";
         ArrayList<Map<String, String>> response;
         try {
-            response = DatabaseManager.retrieveFromDatabase(retrivalString, gameIdentifier);
+            response = DatabaseManager.getFromDatabase(retrivalString, gameIdentifier);
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -62,7 +62,7 @@ public class SQLGameDAO implements GameDAO {
         String retrivalString = "SELECT gameID FROM games;";
         ArrayList<Map<String, String>> response;
         try {
-            response = DatabaseManager.retrieveFromDatabase(retrivalString);
+            response = DatabaseManager.getFromDatabase(retrivalString);
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }

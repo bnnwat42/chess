@@ -40,7 +40,7 @@ public class SQLAuthDAO implements AuthDAO {
         ArrayList<Map<String, String>> response;
 
         try {
-            response = DatabaseManager.retrieveFromDatabase(retrivalString, authIdentifier);
+            response = DatabaseManager.getFromDatabase(retrivalString, authIdentifier);
         } catch (SQLException | DataAccessException e) {
             throw new DataAccessException(e.getMessage());
         }

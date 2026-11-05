@@ -1,8 +1,6 @@
 package dataaccess.sql;
 
-import chess.ChessGame;
 import exceptions.DataAccessException;
-import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +13,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SQLUserDAOTest {
 
-    SQLUserDAO DAO;
+    SQLUserDAO dao;
+    static String name;
 
     @BeforeAll
     static void createDatabase() {
         try {
-            DatabaseManager.createDatabase();
+            name = DatabaseManager.createDatabase();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -34,28 +33,28 @@ class SQLUserDAOTest {
         } catch (DataAccessException | SQLException e) {
             throw new RuntimeException(e);
         }
-        DAO = assertDoesNotThrow(() -> new SQLUserDAO());
+        dao = assertDoesNotThrow(() -> new SQLUserDAO());
     }
 
     @Test
     void noDatabase() {
-        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP DATABASE CHESS;"));
-        assertThrows(DataAccessException.class, () -> DAO.createUser(new UserData("1", "2", "3")));
-        assertThrows(DataAccessException.class, () -> DAO.clear());
-        assertThrows(DataAccessException.class, () -> DAO.getUser("Bob"));
+        assertDoesNotThrow(() -> DatabaseManager.updateDatabase("DROP TABLE users;"));
+        assertThrows(DataAccessException.class, () -> dao.createUser(new UserData("1", "2", "3")));
+        assertThrows(DataAccessException.class, () -> dao.clear());
+        assertThrows(DataAccessException.class, () -> dao.getUser("Bob"));
     }
 
     @Test
     void createUser() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
-        assertDoesNotThrow(() -> DAO.createUser(newUser));
+        assertDoesNotThrow(() -> dao.createUser(newUser));
     }
 
     @Test
     void getUser() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
-        assertDoesNotThrow(() -> DAO.createUser(newUser));
-        var retrievedUse = assertDoesNotThrow(() -> DAO.getUser("Bob"));
+        assertDoesNotThrow(() -> dao.createUser(newUser));
+        var retrievedUse = assertDoesNotThrow(() -> dao.getUser("Bob"));
         assertEquals(newUser.email(), retrievedUse.email());
         assertEquals(newUser.username(), retrievedUse.username());
         assertTrue(BCrypt.checkpw(newUser.password(), retrievedUse.password()));
@@ -64,8 +63,8 @@ class SQLUserDAOTest {
     @Test
     void clear() {
         UserData newUser = new UserData("Bob", "1234", "Bob@byu.edu");
-        assertDoesNotThrow(() -> DAO.createUser(newUser));
-        assertDoesNotThrow(() -> DAO.clear());
-        assertNull(assertDoesNotThrow(() -> DAO.getUser("Bob")));
+        assertDoesNotThrow(() -> dao.createUser(newUser));
+        assertDoesNotThrow(() -> dao.clear());
+        assertNull(assertDoesNotThrow(() -> dao.getUser("Bob")));
     }
 }

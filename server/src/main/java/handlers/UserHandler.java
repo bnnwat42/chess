@@ -21,7 +21,7 @@ public class UserHandler {
     }
 
     public String registerUser(Context ctx) throws AlreadyTakenException, BadRequestException, DataAccessException {
-        Map<String, String> body = getBodyObject(ctx, Map.class);
+        Map<String, String> body = BodyHandler.getBodyObject(ctx, Map.class);
 
         Set<String> keys = body.keySet();
         if (isMalformed(keys, new String[]{"username", "password", "email"})) {
@@ -38,18 +38,8 @@ public class UserHandler {
         userService.clear();
     }
 
-    private static <T> T getBodyObject(Context context, Class<T> clazz) {
-        var bodyObject = new Gson().fromJson(context.body(), clazz);
-
-        if (bodyObject == null) {
-            throw new RuntimeException("missing required body");
-        }
-
-        return bodyObject;
-    }
-
     public String loginUser(Context ctx) throws DataAccessException {
-        Map<String, String> body = getBodyObject(ctx, Map.class);
+        Map<String, String> body = BodyHandler.getBodyObject(ctx, Map.class);
 
         Set<String> keys = body.keySet();
         if (isMalformed(keys, new String[]{"username", "password"})) {
