@@ -33,7 +33,7 @@ public class SQLUserDAO implements UserDAO {
         String hashedPassword = hashPassword(userInfo.password());
         try {
             DatabaseManager.updateDatabase(updateString, userInfo.username(), hashedPassword, userInfo.email());
-        } catch (SQLException | DataAccessException e) {
+        } catch (SQLException e) {
             throw new AlreadyTakenException();
         }
     }
