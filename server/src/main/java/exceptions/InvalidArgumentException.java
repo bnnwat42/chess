@@ -1,4 +1,4 @@
-package passoff.server;
+package exceptions;
 
 public class InvalidArgumentException extends Exception {
 }
