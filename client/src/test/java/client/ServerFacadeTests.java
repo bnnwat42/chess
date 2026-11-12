@@ -1,3 +1,5 @@
+import client.ServerFacade;
+import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
@@ -5,11 +7,13 @@ import server.Server;
 public class ServerFacadeTests {
 
     private static Server server;
+    private ServerFacade facade;
+    private static int port;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(0);
+        port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
     }
 
@@ -18,10 +22,21 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    public void createFacade() {
+        facade = new ServerFacade("localhost", port);
+        facade.clearDatabase();
+    }
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    public void clearDatabase() {
+        facade.clearDatabase();
+    }
+
+    @Test
+    public void registerUser() {
+        UserData newUser = new UserData("Bob", "1234", "gocougs@byu.edu");
+        facade.registerUser(newUser);
     }
 
 }

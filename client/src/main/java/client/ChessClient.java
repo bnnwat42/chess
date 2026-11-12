@@ -1,25 +1,36 @@
 package client;
 
+import model.UserData;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
 public class ChessClient {
     private String userName;
     private STATE userState;
+    private String authToken;
+    ServerFacade facade;
+
+    public ChessClient(String host, int port) {
+        userName = null;
+        userState = STATE.LOGGEDOUT;
+        facade = new ServerFacade(host, port);
+    }
 
     public ChessClient() {
         userName = null;
         userState = STATE.LOGGEDOUT;
+        facade = new ServerFacade("localhost", 8080);
     }
 
     public void serviceLoop() {
         System.out.println("CS 240 Chess Client!!!");
+        renderOptions();
 
         Scanner scanner = new Scanner(System.in);
         var response = new String[0];
         while (!userState.equals(STATE.QUIT)) {
             response = scanner.nextLine().split(" ");
-            System.out.println(Arrays.toString(response));
             if (userState == STATE.LOGGEDOUT) {
                 loggedOutOptions(response);
             }
@@ -34,12 +45,18 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("login")) {
 
         } else if (response[0].equalsIgnoreCase("register")) {
-            register();
+            authToken = register(response);
+        } else if (response[0].equalsIgnoreCase("clear")) {
+            facade.clearDatabase();
+            System.out.println("Cleared database");
         }
     }
 
-    private void register() {
-        
+    private String register(String[] response) {
+        if (response.length != 4) {
+            System.out.println("Wrong number of arguments");
+        }
+        return facade.registerUser(new UserData(response[1], response[2], response[3]));
     }
 
     private void help(String[] response) {
@@ -71,6 +88,7 @@ public class ChessClient {
     }
 
     private void renderOptions() {
+        System.out.println("Available commands: ");
         if (userState.equals(STATE.LOGGEDOUT)) {
             System.out.println("register <USERNAME> <PASSWORD> <EMAIL>");
             System.out.println("login <USERNAME> <PASSWORD>");
