@@ -33,8 +33,46 @@ public class ChessClient {
             response = scanner.nextLine().split(" ");
             if (userState == STATE.LOGGEDOUT) {
                 loggedOutOptions(response);
+            } else if (userState == STATE.LOGGEDIN) {
+                loggedInOptions(response);
             }
         }
+    }
+
+    private void loggedInOptions(String[] response) {
+        if (response[0].equalsIgnoreCase("help")) {
+            help(response);
+        } else if (response[0].equalsIgnoreCase("quit")) {
+            userState = STATE.QUIT;
+        } else if (response[0].equalsIgnoreCase("create")) {
+            create(response);
+        } else if (response[0].equalsIgnoreCase("list")) {
+            list(response);
+        } else if (response[0].equalsIgnoreCase("join")) {
+//            facade.clearDatabase();
+        } else if (response[0].equalsIgnoreCase("observe")) {
+//            facade.clearDatabase();
+        } else if (response[0].equalsIgnoreCase("logout")) {
+            logout(response);
+        } else {
+            System.out.println("Invalid command");
+        }
+    }
+
+    private void list(String[] response) {
+        if (response.length != 1) {
+            System.out.println("Wrong number of arguments");
+            return;
+        }
+        facade.listGames(authToken);
+    }
+
+    private void create(String[] response) {
+        if (response.length != 2) {
+            System.out.println("Wrong number of arguments");
+            return;
+        }
+        facade.createGame(authToken, response[1]);
     }
 
     private void loggedOutOptions(String[] response) {
@@ -43,20 +81,50 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("quit")) {
             userState = STATE.QUIT;
         } else if (response[0].equalsIgnoreCase("login")) {
-
+            login(response);
         } else if (response[0].equalsIgnoreCase("register")) {
-            authToken = register(response);
+            register(response);
         } else if (response[0].equalsIgnoreCase("clear")) {
             facade.clearDatabase();
             System.out.println("Cleared database");
+        } else {
+            System.out.println("Invalid command");
         }
     }
 
-    private String register(String[] response) {
+    private void logout(String[] response) {
+        if (response.length != 1) {
+            System.out.println("Wrong number of arguments");
+            return;
+        }
+        facade.logoutUser();
+        authToken = "";
+        userName = "";
+        userState = STATE.LOGGEDOUT;
+    }
+
+    private void login(String[] response) {
+        if (response.length != 3) {
+            System.out.println("Wrong number of arguments");
+            return;
+        }
+        String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
+        userState = STATE.LOGGEDIN;
+        userName = response[1];
+        authToken = returnedToken;
+        renderOptions();
+    }
+
+    private void register(String[] response) {
         if (response.length != 4) {
             System.out.println("Wrong number of arguments");
+            return;
         }
-        return facade.registerUser(new UserData(response[1], response[2], response[3]));
+        String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
+        userState = STATE.LOGGEDIN;
+        userName = response[1];
+        authToken = returnedToken;
+        renderOptions();
     }
 
     private void help(String[] response) {

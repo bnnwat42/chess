@@ -84,20 +84,94 @@ public class ServerFacade {
         }
     }
 
-    public void loginUser() {
+    public String loginUser(UserData user) {
+        String url = boilerURL + "/session";
+        String body = new Gson().toJson(
+                Map.of("username", user.username(),
+                        "password", user.password()
+                ));
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
 
+            var responseBody = sendRequest(request).body();
+            Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
+            return myMap.get("authToken");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void logoutUser() {
+        String url = boilerURL + "/session";
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .DELETE()
+                    .build();
 
+            sendRequest(request);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void listGames() {
+    public Map<String, String> listGames(String authToken) {
+        String url = boilerURL + "/game";
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .GET()
+                    .header("Authorization", authToken)
+                    .build();
 
+            var responseBody = sendRequest(request).body();
+            Map myMap = new Gson().fromJson(responseBody, Map.class);
+            System.out.println(myMap.get("gameID"));
+            return ((Number) myMap.get("gameID")).intValue();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void createGame() {
+    public int createGame(String authToken, String gameName) {
+        String url = boilerURL + "/game";
+        String body = new Gson().toJson(
+                Map.of(
+                        "gameName", gameName
+                ));
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .header("Authorization", authToken)
+                    .build();
 
+            var responseBody = sendRequest(request).body();
+            Map myMap = new Gson().fromJson(responseBody, Map.class);
+            System.out.println(myMap.get("gameID"));
+            return ((Number) myMap.get("gameID")).intValue();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void joinGame() {

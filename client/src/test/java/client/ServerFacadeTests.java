@@ -3,6 +3,8 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class ServerFacadeTests {
 
@@ -37,6 +39,13 @@ public class ServerFacadeTests {
     public void registerUser() {
         UserData newUser = new UserData("Bob", "1234", "gocougs@byu.edu");
         facade.registerUser(newUser);
+    }
+
+    @Test
+    public void loginUser() {
+        UserData newUser = new UserData("Bob", "1234", "gocougs@byu.edu");
+        facade.registerUser(newUser);
+        var authToken = facade.loginUser(newUser);
     }
 
 }
