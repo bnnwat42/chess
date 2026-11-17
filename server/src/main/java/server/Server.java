@@ -111,7 +111,7 @@ public class Server {
         }
     }
 
-    private void clearDatabase(Context ctx) {//throws ResponseException {
+    private void clearDatabase(Context ctx) {
         try {
             userHandler.clear();
             gameHandler.clear();

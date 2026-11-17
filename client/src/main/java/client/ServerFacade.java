@@ -1,15 +1,24 @@
 package client;
 
+import chess.ChessGame;
+import client.exceptions.AlreadyTakenException;
+import client.exceptions.BadRequestException;
+import client.exceptions.UnauthorizedException;
 import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 import io.javalin.Javalin;
+import model.GameData;
 import model.UserData;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Map;
 
@@ -23,38 +32,44 @@ public class ServerFacade {
         boilerURL = "http://" + host + ":" + port;
     }
 
-    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException {
+    private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException, AlreadyTakenException {
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
         switch (response.statusCode()) {
             case 200:
                 return response;
-            case 400: //BadRequestException
-                throw new RuntimeException();
-            case 401: //UnauthorizedException
-                throw new RuntimeException();
-            case 403: //AlreadyTakenException
-                throw new RuntimeException();
-            case 500: //Other
+            case 400:
+                System.out.println("Bad request. Please modify input");
+                throw new BadRequestException();
+            case 401:
+                System.out.println("Unauthorized action. Please sign in");
+                throw new UnauthorizedException();
+            case 403:
+                System.out.println("Option already taken. Please choose another");
+                throw new AlreadyTakenException();
+            case 500:
+                System.out.println("Server error. Please try again.");
                 throw new RuntimeException();
             default:
+                System.out.println("Unknown error. Please try again.");
                 throw new RuntimeException("Unknown error");
         }
     }
 
     public void clearDatabase() {
         String url = boilerURL + "/db";
+        HttpRequest request = null;
         try {
-            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+            request = HttpRequest.newBuilder().uri(new URI(url))
                     .timeout(java.time.Duration.ofMillis(5000))
                     .DELETE().build();
-
-            sendRequest(request);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        }
+
+        try {
+            sendRequest(request);
+        } catch (IOException | InterruptedException | AlreadyTakenException e) {
             throw new RuntimeException(e);
         }
     }
@@ -75,11 +90,7 @@ public class ServerFacade {
             var responseBody = sendRequest(request).body();
             Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
             return myMap.get("authToken");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | AlreadyTakenException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -99,11 +110,7 @@ public class ServerFacade {
             var responseBody = sendRequest(request).body();
             Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
             return myMap.get("authToken");
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | InterruptedException | AlreadyTakenException | IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -117,16 +124,12 @@ public class ServerFacade {
                     .build();
 
             sendRequest(request);
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | IOException | InterruptedException | AlreadyTakenException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Map<String, String> listGames(String authToken) {
+    public ArrayList<GameData> listGames(String authToken) {
         String url = boilerURL + "/game";
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
@@ -136,14 +139,13 @@ public class ServerFacade {
                     .build();
 
             var responseBody = sendRequest(request).body();
-            Map myMap = new Gson().fromJson(responseBody, Map.class);
-            System.out.println(myMap.get("gameID"));
-            return ((Number) myMap.get("gameID")).intValue();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+            Gson gson = new Gson();
+
+            Type type = new TypeToken<Map<String, ArrayList<GameData>>>() {
+            }.getType();
+            Map<String, ArrayList<GameData>> myMap = gson.fromJson(responseBody, type);
+            return myMap.get("games");
+        } catch (URISyntaxException | IOException | InterruptedException | AlreadyTakenException e) {
             throw new RuntimeException(e);
         }
     }
@@ -163,18 +165,29 @@ public class ServerFacade {
 
             var responseBody = sendRequest(request).body();
             Map myMap = new Gson().fromJson(responseBody, Map.class);
-            System.out.println(myMap.get("gameID"));
             return ((Number) myMap.get("gameID")).intValue();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
+        } catch (URISyntaxException | InterruptedException | AlreadyTakenException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void joinGame() {
+    public void joinGame(String authToken, int gameID, ChessGame.TeamColor playerColor) {
+        String url = boilerURL + "/game";
+        String body = new Gson().toJson(
+                Map.of(
+                        "gameID", gameID,
+                        "playerColor", playerColor
+                ));
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .PUT(HttpRequest.BodyPublishers.ofString(body))
+                    .header("Authorization", authToken)
+                    .build();
 
+            sendRequest(request).body();
+        } catch (URISyntaxException | InterruptedException | AlreadyTakenException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

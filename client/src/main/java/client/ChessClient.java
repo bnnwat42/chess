@@ -1,7 +1,10 @@
 package client;
 
+import chess.ChessGame;
+import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -9,7 +12,8 @@ public class ChessClient {
     private String userName;
     private STATE userState;
     private String authToken;
-    ServerFacade facade;
+    private final ServerFacade facade;
+    private Scanner scanner;
 
     public ChessClient(String host, int port) {
         userName = null;
@@ -21,13 +25,13 @@ public class ChessClient {
         userName = null;
         userState = STATE.LOGGEDOUT;
         facade = new ServerFacade("localhost", 8080);
+        scanner = new Scanner(System.in);
     }
 
     public void serviceLoop() {
         System.out.println("CS 240 Chess Client!!!");
         renderOptions();
 
-        Scanner scanner = new Scanner(System.in);
         var response = new String[0];
         while (!userState.equals(STATE.QUIT)) {
             response = scanner.nextLine().split(" ");
@@ -64,7 +68,66 @@ public class ChessClient {
             System.out.println("Wrong number of arguments");
             return;
         }
-        facade.listGames(authToken);
+        ArrayList<GameData> gameList = facade.listGames(authToken);
+        int counter = 1;
+        for (GameData game : gameList) {
+            System.out.print(counter++ + ". ");
+            System.out.print(game.gameName());
+            System.out.print(" white: " + game.whiteUsername());
+            System.out.println(" black: " + game.blackUsername());
+        }
+        userState = STATE.CHOOSEGAME;
+        while (userState == STATE.CHOOSEGAME) {
+            System.out.println("What game would you like to join? (choose a number or quit cancel)");
+            String[] numResponse = scanner.nextLine().split(" ");
+            if (numResponse[0].equalsIgnoreCase("quit")) {
+                userState = STATE.LOGGEDIN;
+                return;
+            } else if (numResponse[0].equalsIgnoreCase("list")) {
+                list(response);
+                return;
+            }
+            try {
+                int gameNum = Integer.parseInt(numResponse[0]);
+                if (gameList.size() <= gameNum || gameNum <= 0) {
+                    System.out.println("Please enter valid game number");
+                    continue;
+                }
+                GameData game = gameList.get(gameNum);
+                while (true) {
+                    if (game.blackUsername() == null && game.whiteUsername() == null) {
+                        System.out.println("Choose your color: ([B]lack or [W]hite");
+                    } else if (game.blackUsername() == null) {
+                        System.out.println("Choose your color: [B]lack");
+                    } else if (game.whiteUsername() == null) {
+                        System.out.println("Choose your color: [W]hite");
+                    } else {
+                        System.out.println("Sorry, all spots filled");
+                        return;
+                    }
+                    String[] colorResponse = scanner.nextLine().split(" ");
+                    if (colorResponse[0].equalsIgnoreCase("W") ||
+                            colorResponse[0].equalsIgnoreCase("white")) {
+                        try {
+                            facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.WHITE);
+                            return;
+                        } catch (RuntimeException e) {
+                            return;
+                        }
+                    } else if (colorResponse[0].equalsIgnoreCase("B") ||
+                            colorResponse[0].equalsIgnoreCase("black")) {
+                        try {
+                            facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.BLACK);
+                            return;
+                        } catch (RuntimeException e) {
+                            return;
+                        }
+                    }
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter valid game number");
+            }
+        }
     }
 
     private void create(String[] response) {
@@ -72,7 +135,11 @@ public class ChessClient {
             System.out.println("Wrong number of arguments");
             return;
         }
-        facade.createGame(authToken, response[1]);
+        try {
+            facade.createGame(authToken, response[1]);
+        } catch (RuntimeException e) {
+            return;
+        }
     }
 
     private void loggedOutOptions(String[] response) {
@@ -85,8 +152,12 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("register")) {
             register(response);
         } else if (response[0].equalsIgnoreCase("clear")) {
-            facade.clearDatabase();
-            System.out.println("Cleared database");
+            try {
+                facade.clearDatabase();
+                System.out.println("Cleared database");
+            } catch (RuntimeException e) {
+                return;
+            }
         } else {
             System.out.println("Invalid command");
         }
@@ -97,10 +168,14 @@ public class ChessClient {
             System.out.println("Wrong number of arguments");
             return;
         }
-        facade.logoutUser();
-        authToken = "";
-        userName = "";
-        userState = STATE.LOGGEDOUT;
+        try {
+            facade.logoutUser();
+            authToken = "";
+            userName = "";
+            userState = STATE.LOGGEDOUT;
+        } catch (RuntimeException e) {
+            return;
+        }
     }
 
     private void login(String[] response) {
@@ -108,11 +183,15 @@ public class ChessClient {
             System.out.println("Wrong number of arguments");
             return;
         }
-        String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
-        userState = STATE.LOGGEDIN;
-        userName = response[1];
-        authToken = returnedToken;
-        renderOptions();
+        try {
+            String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
+            userState = STATE.LOGGEDIN;
+            userName = response[1];
+            authToken = returnedToken;
+            renderOptions();
+        } catch (RuntimeException e) {
+            return;
+        }
     }
 
     private void register(String[] response) {
@@ -120,11 +199,15 @@ public class ChessClient {
             System.out.println("Wrong number of arguments");
             return;
         }
-        String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
-        userState = STATE.LOGGEDIN;
-        userName = response[1];
-        authToken = returnedToken;
-        renderOptions();
+        try {
+            String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
+            userState = STATE.LOGGEDIN;
+            userName = response[1];
+            authToken = returnedToken;
+            renderOptions();
+        } catch (RuntimeException e) {
+            return;
+        }
     }
 
     private void help(String[] response) {
