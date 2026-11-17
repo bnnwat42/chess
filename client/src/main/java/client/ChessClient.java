@@ -63,7 +63,7 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("quit")) {
             activeGameId = -1;
             teamColor = null;
-            userState = STATE.LOGGED_IN;
+            changeState(STATE.LOGGED_IN);
         } else {
             GameData gameData = null;
             try {
@@ -81,7 +81,7 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("quit")) {
             activeGameId = -1;
             teamColor = null;
-            userState = STATE.LOGGED_IN;
+            changeState(STATE.LOGGED_IN);
         } else {
             GameData gameData = null;
             try {
@@ -140,7 +140,7 @@ public class ChessClient {
             if (response[0].equalsIgnoreCase("observe")) {
                 activeGameId = gameList.get(gameNum - 1).gameID();
                 System.out.println("observing");
-                userState = STATE.OBSERVING;
+                changeState(STATE.OBSERVING);
                 GameData gameData = null;
                 observerOptions(new String[]{""});
                 renderOptions();
@@ -211,7 +211,7 @@ public class ChessClient {
         }
         activeGameId = gameList.get(gameNum - 1).gameID();
         System.out.println("joined");
-        userState = STATE.IN_GAME;
+        changeState(STATE.IN_GAME);
         GameData gameData = null;
         gameOptions(new String[]{""});
     }
@@ -259,7 +259,7 @@ public class ChessClient {
             facade.logoutUser(authToken);
             authToken = "";
             userName = "";
-            userState = STATE.LOGGED_OUT;
+            changeState(STATE.LOGGED_OUT);
         } catch (RuntimeException e) {
             return;
         }
@@ -272,7 +272,7 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
-            userState = STATE.LOGGED_IN;
+            changeState(STATE.LOGGED_IN);
             userName = response[1];
             authToken = returnedToken;
             renderOptions();
@@ -288,7 +288,7 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
-            userState = STATE.LOGGED_IN;
+            changeState(STATE.LOGGED_IN);
             userName = response[1];
             authToken = returnedToken;
             renderOptions();
@@ -355,6 +355,11 @@ public class ChessClient {
             System.out.println("quit");
             System.out.println("help");
         }
+    }
+
+    private void changeState(STATE newState) {
+        userState = newState;
+        renderOptions();
     }
 
 }
