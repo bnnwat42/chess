@@ -7,7 +7,6 @@ import org.junit.jupiter.api.*;
 import server.Server;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -110,4 +109,10 @@ public class ServerFacadeTests {
         assertEquals("1", response.getFirst().get("doesExist"));
     }
 
+    @Test
+    void getGame() {
+        String gameName = "Bob's game";
+        int gameId = facade.createGame(authToken, gameName);
+        facade.getGame(gameId);
+    }
 }

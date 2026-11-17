@@ -32,6 +32,8 @@ public class Server {
         javalinObj.get("/game", context -> listGames(context));
         javalinObj.post("/game", context -> createGame(context));
         javalinObj.put("/game", context -> joinGame(context));
+        javalinObj.post("/gameData", context -> getGame(context));
+
     }
 
     private void createHandlers() {
@@ -76,6 +78,16 @@ public class Server {
             String gameList = gameHandler.listGames(ctx);
             ctx.status(200);
             ctx.result(gameList);
+        } catch (Exception e) {
+            handleException(ctx, e);
+        }
+    }
+
+    private void getGame(Context ctx) {
+        try {
+            String gameData = gameHandler.getGame(ctx);
+            ctx.status(200);
+            ctx.result(gameData);
         } catch (Exception e) {
             handleException(ctx, e);
         }

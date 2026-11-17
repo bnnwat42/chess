@@ -29,7 +29,7 @@ class GameServiceTest {
         assertDoesNotThrow(() -> userService.clear());
         assertDoesNotThrow(() -> gameService.clear());
         testUser = new UserData("bob", "1234", "cosmo@byu.edu");
-        testGame = new GameData(1, "", "", "GameName", new ChessGame());
+        testGame = new GameData(1, null, null, "GameName", new ChessGame());
         newAuth = assertDoesNotThrow(() -> userService.register(testUser));
     }
 
@@ -39,6 +39,14 @@ class GameServiceTest {
         int gameID = assertDoesNotThrow(() -> gameService.createGame(newGameRequest));
         CreateGameRequest fakeGameRequest = new CreateGameRequest("Fake-Token-1234", testGame.gameName());
         assertThrows(UnauthorizedException.class, () -> gameService.createGame(fakeGameRequest));
+    }
+
+    @Test
+    void getGame() {
+        CreateGameRequest newGameRequest = new CreateGameRequest(newAuth.authToken(), testGame.gameName());
+        int gameID = assertDoesNotThrow(() -> gameService.createGame(newGameRequest));
+        GameData gotGame = assertDoesNotThrow(() -> gameService.getGame(gameID));
+        assertEquals(testGame, gotGame);
     }
 
     @Test

@@ -6,6 +6,7 @@ import exceptions.AlreadyTakenException;
 import exceptions.BadRequestException;
 import exceptions.DataAccessException;
 import io.javalin.http.Context;
+import model.GameData;
 import service.CreateGameRequest;
 import service.GameInfo;
 import service.GameService;
@@ -14,6 +15,7 @@ import service.JoinGameRequest;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 public class GameHandler {
 
@@ -21,6 +23,18 @@ public class GameHandler {
 
     public GameHandler() throws DataAccessException {
         gameService = new GameService();
+    }
+
+    public String getGame(Context ctx) {
+        Map<String, Double> body = BodyHandler.getBodyObject(ctx, Map.class);
+
+        Set<String> keys = body.keySet();
+        if (UserHandler.isMalformed(keys, new String[]{"gameID"})) {
+            throw new BadRequestException();
+        }
+
+        int gameId = body.get("gameID").intValue();
+        return new Gson().toJson(gameService.getGame(gameId));
     }
 
     public String listGames(Context ctx) throws DataAccessException {

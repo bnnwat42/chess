@@ -190,4 +190,23 @@ public class ServerFacade {
             throw new RuntimeException(e);
         }
     }
+
+    public GameData getGame(int gameID) {
+        String url = boilerURL + "/gameData";
+        String body = new Gson().toJson(
+                Map.of("gameID", gameID
+                ));
+        try {
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            var responseBody = sendRequest(request).body();
+            var gameData = new Gson().fromJson(responseBody, GameData.class);
+            return gameData;
+        } catch (URISyntaxException | AlreadyTakenException | InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

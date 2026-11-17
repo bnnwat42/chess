@@ -10,6 +10,7 @@ import exceptions.DataAccessException;
 import exceptions.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -74,5 +75,13 @@ public class GameService {
 
     public void clear() throws DataAccessException {
         gameStorage.clear();
+    }
+
+    public GameData getGame(int gameID) {
+        try {
+            return gameStorage.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
