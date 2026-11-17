@@ -5,7 +5,6 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class ChessClient {
@@ -47,13 +46,14 @@ public class ChessClient {
         if (response[0].equalsIgnoreCase("help")) {
             help(response);
         } else if (response[0].equalsIgnoreCase("quit")) {
+            logout(response);
             userState = STATE.QUIT;
         } else if (response[0].equalsIgnoreCase("create")) {
             create(response);
         } else if (response[0].equalsIgnoreCase("list")) {
             list(response);
         } else if (response[0].equalsIgnoreCase("join")) {
-//            facade.clearDatabase();
+            join(response);
         } else if (response[0].equalsIgnoreCase("observe")) {
 //            facade.clearDatabase();
         } else if (response[0].equalsIgnoreCase("logout")) {
@@ -63,12 +63,43 @@ public class ChessClient {
         }
     }
 
+    private void join(String[] response) {
+        if (response.length != 3) {
+            System.out.println("Wrong number of arguments");
+            return;
+        }
+        ArrayList<GameData> gameList;
+        try {
+            gameList = facade.listGames(authToken);
+        } catch (RuntimeException e) {
+            return;
+        }
+
+        String numResponse = response[1];
+        try {
+            int gameNum = Integer.parseInt(numResponse);
+            if (gameList.size() < gameNum || gameNum <= 0) {
+                System.out.println("Please enter valid game number");
+                return;
+            }
+            GameData game = gameList.get(gameNum - 1);
+            joinGameNoNum(gameNum, game, gameList, response[2]);
+        } catch (NumberFormatException e) {
+            System.out.println("Please enter valid game number");
+        }
+    }
+
     private void list(String[] response) {
         if (response.length != 1) {
             System.out.println("Wrong number of arguments");
             return;
         }
-        ArrayList<GameData> gameList = facade.listGames(authToken);
+        ArrayList<GameData> gameList;
+        try {
+            gameList = facade.listGames(authToken);
+        } catch (RuntimeException e) {
+            return;
+        }
         int counter = 1;
         for (GameData game : gameList) {
             System.out.print(counter++ + ". ");
@@ -76,58 +107,42 @@ public class ChessClient {
             System.out.print(" white: " + game.whiteUsername());
             System.out.println(" black: " + game.blackUsername());
         }
-        userState = STATE.CHOOSEGAME;
-        while (userState == STATE.CHOOSEGAME) {
-            System.out.println("What game would you like to join? (choose a number or quit cancel)");
-            String[] numResponse = scanner.nextLine().split(" ");
-            if (numResponse[0].equalsIgnoreCase("quit")) {
-                userState = STATE.LOGGEDIN;
-                return;
-            } else if (numResponse[0].equalsIgnoreCase("list")) {
-                list(response);
+    }
+
+    private void joinGameNoNum(int gameNum, GameData game, ArrayList<GameData> gameList, String color) {
+
+        if (game.blackUsername() != null && game.whiteUsername() != null) {
+            System.out.println("Sorry, all spots filled");
+            return;
+        }
+        if (color.equalsIgnoreCase("W") ||
+                color.equalsIgnoreCase("white")) {
+            if (game.blackUsername() != null) {
+                System.out.println("White already taken. Please choose new color.");
                 return;
             }
             try {
-                int gameNum = Integer.parseInt(numResponse[0]);
-                if (gameList.size() <= gameNum || gameNum <= 0) {
-                    System.out.println("Please enter valid game number");
-                    continue;
-                }
-                GameData game = gameList.get(gameNum);
-                while (true) {
-                    if (game.blackUsername() == null && game.whiteUsername() == null) {
-                        System.out.println("Choose your color: ([B]lack or [W]hite");
-                    } else if (game.blackUsername() == null) {
-                        System.out.println("Choose your color: [B]lack");
-                    } else if (game.whiteUsername() == null) {
-                        System.out.println("Choose your color: [W]hite");
-                    } else {
-                        System.out.println("Sorry, all spots filled");
-                        return;
-                    }
-                    String[] colorResponse = scanner.nextLine().split(" ");
-                    if (colorResponse[0].equalsIgnoreCase("W") ||
-                            colorResponse[0].equalsIgnoreCase("white")) {
-                        try {
-                            facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.WHITE);
-                            return;
-                        } catch (RuntimeException e) {
-                            return;
-                        }
-                    } else if (colorResponse[0].equalsIgnoreCase("B") ||
-                            colorResponse[0].equalsIgnoreCase("black")) {
-                        try {
-                            facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.BLACK);
-                            return;
-                        } catch (RuntimeException e) {
-                            return;
-                        }
-                    }
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter valid game number");
+                facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.WHITE);
+                System.out.println("joined");
+                return;
+            } catch (RuntimeException e) {
+                return;
+            }
+        } else if (color.equalsIgnoreCase("B") ||
+                color.equalsIgnoreCase("black")) {
+            if (game.blackUsername() != null) {
+                System.out.println("Black already taken. Please choose new color.");
+                return;
+            }
+            try {
+                facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.BLACK);
+                System.out.println("joined");
+                return;
+            } catch (RuntimeException e) {
+                return;
             }
         }
+
     }
 
     private void create(String[] response) {
@@ -137,6 +152,7 @@ public class ChessClient {
         }
         try {
             facade.createGame(authToken, response[1]);
+            System.out.println("Created");
         } catch (RuntimeException e) {
             return;
         }
@@ -248,12 +264,13 @@ public class ChessClient {
         } else if (userState.equals(STATE.LOGGEDIN)) {
             System.out.println("create <NAME>");
             System.out.println("list");
-            System.out.println("join <ID> [WHITE|BLACK]");
+            System.out.println("join <ID> [(W)HITE|(B)LACK]");
             System.out.println("observe <ID>");
             System.out.println("logout");
             System.out.println("quit");
             System.out.println("help");
         }
+
     }
 
 }

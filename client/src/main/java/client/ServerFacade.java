@@ -42,10 +42,10 @@ public class ServerFacade {
                 System.out.println("Bad request. Please modify input");
                 throw new BadRequestException();
             case 401:
-                System.out.println("Unauthorized action. Please sign in");
+                System.out.println("Unauthorized action. Please check your inputs");
                 throw new UnauthorizedException();
             case 403:
-                System.out.println("Option already taken. Please choose another");
+                System.out.println("Already taken. Please choose another");
                 throw new AlreadyTakenException();
             case 500:
                 System.out.println("Server error. Please try again.");

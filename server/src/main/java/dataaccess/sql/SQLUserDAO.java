@@ -44,7 +44,7 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public UserData getUser(String userName) throws DataAccessException {
         ArrayList<Map<String, String>> response;
-        String retrivalString = "SELECT * FROM users WHERE username=?;";
+        String retrivalString = "SELECT * FROM users WHERE username COLLATE utf8mb4_0900_as_cs = ?;";
         try {
             response = DatabaseManager.getFromDatabase(retrivalString, userName);
         } catch (SQLException | DataAccessException e) {
