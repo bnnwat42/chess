@@ -185,7 +185,7 @@ public class ChessClient {
             return;
         }
         try {
-            facade.logoutUser();
+            facade.logoutUser(authToken);
             authToken = "";
             userName = "";
             userState = STATE.LOGGEDOUT;

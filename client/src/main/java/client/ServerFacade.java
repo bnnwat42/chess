@@ -27,7 +27,6 @@ public class ServerFacade {
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     String boilerURL;
 
-
     public ServerFacade(String host, int port) {
         boilerURL = "http://" + host + ":" + port;
     }
@@ -115,12 +114,13 @@ public class ServerFacade {
         }
     }
 
-    public void logoutUser() {
+    public void logoutUser(String authToken) {
         String url = boilerURL + "/session";
         try {
             HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
                     .timeout(java.time.Duration.ofMillis(5000))
                     .DELETE()
+                    .header("Authorization", authToken)
                     .build();
 
             sendRequest(request);
