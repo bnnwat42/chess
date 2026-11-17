@@ -13,6 +13,7 @@ import model.UserData;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -32,8 +33,13 @@ public class ServerFacade {
     }
 
     private HttpResponse<String> sendRequest(HttpRequest request) throws IOException, InterruptedException, AlreadyTakenException {
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response = null;
 
+        try {
+            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (ConnectException e) {
+            System.out.println("Could not connect to server");
+        }
         switch (response.statusCode()) {
             case 200:
                 return response;

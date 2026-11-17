@@ -26,13 +26,13 @@ public class BoardRenderer {
         System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.ERASE_SCREEN);
         System.out.print("   ");
         for (int i = start; i <= end; i++) {
-            System.out.print(" " + (char) (97 + abs(i)) + " ");
+            System.out.print(" " + (char) (104 - abs(i)) + " ");
         }
 
-        System.out.println();
+        System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
 
         for (int i = start; i <= end; i++) {
-            System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + " " + (abs(i) + 1) + " ");
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE + " " + (abs(i) + 1) + " ");
             for (int j = start; j <= end; j++) {
                 if ((abs(i) + abs(j)) % 2 == 1) {
                     System.out.print(EscapeSequences.SET_BG_COLOR_GREY);
@@ -47,12 +47,13 @@ public class BoardRenderer {
                 }
             }
             System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE);
-            System.out.println(" " + (abs(i) + 1) + " ");
+            System.out.println(" " + (abs(i) + 1) + " " + EscapeSequences.RESET_BG_COLOR);
         }
-        System.out.print("   ");
+        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + "   ");
         for (int i = start; i <= end; i++) {
-            System.out.print(" " + (char) (97 + abs(i)) + " ");
+            System.out.print(" " + (char) (104 - abs(i)) + " ");
         }
+        System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
     }
 
     private static String convertPiece(ChessPiece piece) {

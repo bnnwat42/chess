@@ -1,8 +1,9 @@
 package client;
 
 public enum STATE {
-    LOGGEDOUT,
-    LOGGEDIN,
+    LOGGED_OUT,
+    LOGGED_IN,
     QUIT,
-    CHOOSEGAME
+    IN_GAME,
+    OBSERVING
 }

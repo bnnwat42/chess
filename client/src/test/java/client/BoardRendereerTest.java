@@ -7,7 +7,7 @@ public class BoardRendereerTest {
     @Test
     void RenderBoard() throws InterruptedException {
         ChessGame chessGame = new ChessGame();
-//        BoardRenderer.renderBoard(chessGame, ChessGame.TeamColor.BLACK);
-        BoardRenderer.renderBoard(chessGame, ChessGame.TeamColor.WHITE);
+        BoardRenderer.renderBoard(chessGame, ChessGame.TeamColor.BLACK);
+//        BoardRenderer.renderBoard(chessGame, ChessGame.TeamColor.WHITE);
     }
 }

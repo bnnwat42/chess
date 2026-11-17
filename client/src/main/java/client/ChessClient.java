@@ -3,42 +3,93 @@ package client;
 import chess.ChessGame;
 import model.GameData;
 import model.UserData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ui.BoardRenderer;
+import ui.EscapeSequences;
 
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ChessClient {
+    private static final Logger log = LoggerFactory.getLogger(ChessClient.class);
     private String userName;
     private STATE userState;
     private String authToken;
     private final ServerFacade facade;
     private Scanner scanner;
+    int activeGameId = -1;
+    ChessGame.TeamColor teamColor = null;
 
     public ChessClient(String host, int port) {
         userName = null;
-        userState = STATE.LOGGEDOUT;
+        userState = STATE.LOGGED_OUT;
         facade = new ServerFacade(host, port);
     }
 
     public ChessClient() {
         userName = null;
-        userState = STATE.LOGGEDOUT;
+        userState = STATE.LOGGED_OUT;
         facade = new ServerFacade("localhost", 8080);
         scanner = new Scanner(System.in);
     }
 
     public void serviceLoop() {
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.RESET_BG_COLOR + EscapeSequences.ERASE_SCREEN);
         System.out.println("CS 240 Chess Client!!!");
         renderOptions();
 
         var response = new String[0];
         while (!userState.equals(STATE.QUIT)) {
+            System.out.print("[" + userState + "] >>> ");
             response = scanner.nextLine().split(" ");
-            if (userState == STATE.LOGGEDOUT) {
+            if (userState == STATE.LOGGED_OUT) {
                 loggedOutOptions(response);
-            } else if (userState == STATE.LOGGEDIN) {
+            } else if (userState == STATE.LOGGED_IN) {
                 loggedInOptions(response);
+            } else if (userState == STATE.IN_GAME) {
+                gameOptions(response);
+            } else if (userState == STATE.OBSERVING) {
+                observerOptions(response);
             }
+        }
+        facade.logoutUser(authToken);
+    }
+
+    private void observerOptions(String[] response) {
+        if (response[0].equalsIgnoreCase("help")) {
+            help(response);
+        } else if (response[0].equalsIgnoreCase("quit")) {
+            activeGameId = -1;
+            teamColor = null;
+            userState = STATE.LOGGED_IN;
+        } else {
+            GameData gameData = null;
+            try {
+                gameData = facade.getGame(activeGameId);
+            } catch (Exception e) {
+                System.out.println("Could not find chess game");
+            }
+            BoardRenderer.renderBoard(gameData.game(), ChessGame.TeamColor.WHITE);
+        }
+    }
+
+    private void gameOptions(String[] response) {
+        if (response[0].equalsIgnoreCase("help")) {
+            help(response);
+        } else if (response[0].equalsIgnoreCase("quit")) {
+            activeGameId = -1;
+            teamColor = null;
+            userState = STATE.LOGGED_IN;
+        } else {
+            GameData gameData = null;
+            try {
+                gameData = facade.getGame(activeGameId);
+            } catch (Exception e) {
+                System.out.println("Could not find chess game");
+            }
+            BoardRenderer.renderBoard(gameData.game(), teamColor);
         }
     }
 
@@ -53,9 +104,9 @@ public class ChessClient {
         } else if (response[0].equalsIgnoreCase("list")) {
             list(response);
         } else if (response[0].equalsIgnoreCase("join")) {
-            join(response);
+            joinOrObserve(response);
         } else if (response[0].equalsIgnoreCase("observe")) {
-//            facade.clearDatabase();
+            joinOrObserve(response);
         } else if (response[0].equalsIgnoreCase("logout")) {
             logout(response);
         } else {
@@ -63,8 +114,11 @@ public class ChessClient {
         }
     }
 
-    private void join(String[] response) {
-        if (response.length != 3) {
+    private void joinOrObserve(String[] response) {
+        if (response[0].equalsIgnoreCase("join") && response.length != 3) {
+            System.out.println("Wrong number of arguments");
+            return;
+        } else if (response[0].equalsIgnoreCase("observe") && response.length != 2) {
             System.out.println("Wrong number of arguments");
             return;
         }
@@ -83,6 +137,14 @@ public class ChessClient {
                 return;
             }
             GameData game = gameList.get(gameNum - 1);
+            if (response[0].equalsIgnoreCase("observe")) {
+                activeGameId = gameList.get(gameNum - 1).gameID();
+                System.out.println("observing");
+                userState = STATE.OBSERVING;
+                GameData gameData = null;
+                observerOptions(new String[]{""});
+                return;
+            }
             joinGameNoNum(gameNum, game, gameList, response[2]);
         } catch (NumberFormatException e) {
             System.out.println("Please enter valid game number");
@@ -99,6 +161,9 @@ public class ChessClient {
             gameList = facade.listGames(authToken);
         } catch (RuntimeException e) {
             return;
+        }
+        if (gameList.isEmpty()) {
+            System.out.println("No games exist. Please create one.");
         }
         int counter = 1;
         for (GameData game : gameList) {
@@ -117,14 +182,13 @@ public class ChessClient {
         }
         if (color.equalsIgnoreCase("W") ||
                 color.equalsIgnoreCase("white")) {
-            if (game.blackUsername() != null) {
+            if (game.whiteUsername() != null) {
                 System.out.println("White already taken. Please choose new color.");
                 return;
             }
             try {
                 facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.WHITE);
-                System.out.println("joined");
-                return;
+                teamColor = ChessGame.TeamColor.WHITE;
             } catch (RuntimeException e) {
                 return;
             }
@@ -136,13 +200,19 @@ public class ChessClient {
             }
             try {
                 facade.joinGame(authToken, gameList.get(gameNum - 1).gameID(), ChessGame.TeamColor.BLACK);
-                System.out.println("joined");
-                return;
+                teamColor = ChessGame.TeamColor.BLACK;
             } catch (RuntimeException e) {
                 return;
             }
+        } else {
+            System.out.println("Please enter a valid color");
+            return;
         }
-
+        activeGameId = gameList.get(gameNum - 1).gameID();
+        System.out.println("joined");
+        userState = STATE.IN_GAME;
+        GameData gameData = null;
+        gameOptions(new String[]{""});
     }
 
     private void create(String[] response) {
@@ -188,7 +258,7 @@ public class ChessClient {
             facade.logoutUser(authToken);
             authToken = "";
             userName = "";
-            userState = STATE.LOGGEDOUT;
+            userState = STATE.LOGGED_OUT;
         } catch (RuntimeException e) {
             return;
         }
@@ -201,7 +271,7 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
-            userState = STATE.LOGGEDIN;
+            userState = STATE.LOGGED_IN;
             userName = response[1];
             authToken = returnedToken;
             renderOptions();
@@ -217,7 +287,7 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
-            userState = STATE.LOGGEDIN;
+            userState = STATE.LOGGED_IN;
             userName = response[1];
             authToken = returnedToken;
             renderOptions();
@@ -229,7 +299,7 @@ public class ChessClient {
     private void help(String[] response) {
         if (response.length == 1) {
             renderOptions();
-        } else if (userState.equals(STATE.LOGGEDOUT)) {
+        } else if (userState.equals(STATE.LOGGED_OUT)) {
             switch (response[1]) {
                 case "register" -> System.out.println("register <USERNAME> <PASSWORD> <EMAIL> - create an account");
                 case "login" -> System.out.println("login <USERNAME> <PASSWORD> - login into an account");
@@ -238,7 +308,7 @@ public class ChessClient {
                         System.out.println("help - print all available actions\nhelp <ACTION> - learn about action");
                 default -> System.out.printf("unknow command %s\n", response[1]);
             }
-        } else if (userState.equals(STATE.LOGGEDIN)) {
+        } else if (userState.equals(STATE.LOGGED_IN)) {
             switch (response[0]) {
                 case "create" -> System.out.println("create <NAME> - create a new game with the given name");
                 case "list" -> System.out.println("list - list all games and their IDs");
@@ -251,17 +321,24 @@ public class ChessClient {
                         System.out.println("help - print all available actions\nhelp <ACTION> - learn about action");
                 default -> System.out.printf("unknown command %s\n", response[1]);
             }
+        } else if (userState.equals(STATE.IN_GAME)) {
+            switch (response[0]) {
+                case "quit" -> System.out.println("quit - leave game");
+                case "help" ->
+                        System.out.println("help - print all available actions\nhelp <ACTION> - learn about action");
+                default -> System.out.printf("unknown command %s\n", response[1]);
+            }
         }
     }
 
     private void renderOptions() {
         System.out.println("Available commands: ");
-        if (userState.equals(STATE.LOGGEDOUT)) {
+        if (userState.equals(STATE.LOGGED_OUT)) {
             System.out.println("register <USERNAME> <PASSWORD> <EMAIL>");
             System.out.println("login <USERNAME> <PASSWORD>");
             System.out.println("quit");
             System.out.println("help");
-        } else if (userState.equals(STATE.LOGGEDIN)) {
+        } else if (userState.equals(STATE.LOGGED_IN)) {
             System.out.println("create <NAME>");
             System.out.println("list");
             System.out.println("join <ID> [(W)HITE|(B)LACK]");
@@ -269,8 +346,14 @@ public class ChessClient {
             System.out.println("logout");
             System.out.println("quit");
             System.out.println("help");
+        } else if (userState.equals(STATE.IN_GAME)) {
+            System.out.println("quit");
+            System.out.println("help");
+            System.out.println("Coming soon: make a move");
+        } else if (userState.equals(STATE.OBSERVING)) {
+            System.out.println("quit");
+            System.out.println("help");
         }
-
     }
 
 }
