@@ -143,6 +143,7 @@ public class ChessClient {
                 userState = STATE.OBSERVING;
                 GameData gameData = null;
                 observerOptions(new String[]{""});
+                renderOptions();
                 return;
             }
             joinGameNoNum(gameNum, game, gameList, response[2]);
