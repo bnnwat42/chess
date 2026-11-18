@@ -33,7 +33,7 @@ public class ServerFacade {
         HttpResponse<String> response = null;
 
         try {
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            response = HTTP_CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (ConnectException e) {
             System.out.println("Could not connect to server");
         }
@@ -84,7 +84,14 @@ public class ServerFacade {
                         "email", user.email()
                 ));
         try {
-            return getString(url, body);
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            var responseBody = sendRequest(request).body();
+            Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
+            return myMap.get("authToken");
         } catch (URISyntaxException | AlreadyTakenException | InterruptedException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -97,21 +104,17 @@ public class ServerFacade {
                         "password", user.password()
                 ));
         try {
-            return getString(url, body);
+            HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
+                    .timeout(java.time.Duration.ofMillis(5000))
+                    .POST(HttpRequest.BodyPublishers.ofString(body))
+                    .build();
+
+            var responseBody = sendRequest(request).body();
+            Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
+            return myMap.get("authToken");
         } catch (URISyntaxException | InterruptedException | AlreadyTakenException | IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private String getString(String url, String body) throws URISyntaxException, IOException, InterruptedException, AlreadyTakenException {
-        HttpRequest request = HttpRequest.newBuilder().uri(new URI(url))
-                .timeout(java.time.Duration.ofMillis(5000))
-                .POST(HttpRequest.BodyPublishers.ofString(body))
-                .build();
-
-        var responseBody = sendRequest(request).body();
-        Map<String, String> myMap = new Gson().fromJson(responseBody, Map.class);
-        return myMap.get("authToken");
     }
 
     public void logoutUser(String authToken) {
