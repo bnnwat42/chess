@@ -9,6 +9,7 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
     }
 
     public GameData(LinkedTreeMap game) {
-        this((int) game.get("gameID"), (String) game.get("whiteUsername"), (String) game.get("blackUsername"), (String) game.get("gameName"), (ChessGame) game.get("game"));
+        this((int) game.get("gameID"), (String) game.get("whiteUsername"), (String) game.get("blackUsername"),
+                (String) game.get("gameName"), (ChessGame) game.get("game"));
     }
 }

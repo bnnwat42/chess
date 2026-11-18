@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ChessClient {
-    private static final Logger log = LoggerFactory.getLogger(ChessClient.class);
     private String userName;
     private STATE userState;
     private String authToken;
