@@ -1,6 +1,7 @@
 import chess.ChessGame;
 import client.ServerFacade;
 import dataaccess.sql.DatabaseManager;
+import exceptions.AlreadyTakenException;
 import exceptions.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -62,6 +63,8 @@ public class ServerFacadeTests {
     @Test
     public void registerUser() {
         assertTrue(assertDoesNotThrow(() -> existsAuth(authToken)));
+        UserData duplicateUser = new UserData("Bob", "1234", "gocougs@byu.edu");
+        assertThrows(RuntimeException.class, () -> facade.registerUser(duplicateUser));
     }
 
     @Test
@@ -70,6 +73,7 @@ public class ServerFacadeTests {
         facade.registerUser(newUser);
         var authToken = facade.loginUser(newUser);
         assertTrue(assertDoesNotThrow(() -> existsAuth(authToken)));
+        assertThrows(RuntimeException.class, () -> facade.logoutUser("randomAuth"));
     }
 
     @Test
@@ -114,5 +118,6 @@ public class ServerFacadeTests {
         String gameName = "Bob's game";
         int gameId = facade.createGame(authToken, gameName);
         facade.getGame(gameId);
+        assertThrows(RuntimeException.class, () -> facade.getGame(-1));
     }
 }
