@@ -5,9 +5,7 @@ import client.exceptions.AlreadyTakenException;
 import client.exceptions.BadRequestException;
 import client.exceptions.UnauthorizedException;
 import com.google.gson.Gson;
-import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
-import io.javalin.Javalin;
 import model.GameData;
 import model.UserData;
 
@@ -20,7 +18,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Map;
 
 public class ServerFacade {
