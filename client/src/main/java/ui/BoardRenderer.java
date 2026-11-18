@@ -4,7 +4,6 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
-import model.GameData;
 
 import static java.lang.Math.abs;
 
@@ -12,46 +11,47 @@ import static java.lang.Math.abs;
 public class BoardRenderer {
     public static void renderBoard(ChessGame game, ChessGame.TeamColor color) {
         ChessBoard board = game.getBoard();
+        boolean isBlack = color == ChessGame.TeamColor.BLACK;
 
-        int start = 0;
-        int end = 0;
-        if (color == ChessGame.TeamColor.BLACK) {
-            start = 0;
-            end = 7;
-        } else if (color == ChessGame.TeamColor.WHITE) {
-            start = -7;
-            end = 0;
-        }
+        renderFileBar(isBlack);
 
-        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.ERASE_SCREEN);
-        System.out.print("   ");
-        for (int i = start; i <= end; i++) {
-            System.out.print(" " + (char) (104 - abs(i)) + " ");
-        }
-
-        System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
-
-        for (int i = start; i <= end; i++) {
-            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE + " " + (abs(i) + 1) + " ");
-            for (int j = start; j <= end; j++) {
-                if ((abs(i) + abs(j)) % 2 == 1) {
+        for (int i = 0; i < 8; i++) {
+            int rank = isBlack ? i + 1 : 8 - i;
+            System.out.print(EscapeSequences.SET_BG_COLOR_BLACK +
+                    EscapeSequences.SET_TEXT_COLOR_WHITE + " " + (rank) + " ");
+            for (int j = 0; j < 8; j++) {
+                int file = isBlack ? 8 - j : j + 1;
+                if ((i + j) % 2 == 0) {
                     System.out.print(EscapeSequences.SET_BG_COLOR_GREY);
                 } else {
                     System.out.print(EscapeSequences.SET_BG_COLOR_LIGHT_GREY);
                 }
-                ChessPiece piece = board.getPiece(new ChessPosition(abs(i) + 1, abs(j) + 1));
+                ChessPiece piece = board.getPiece(new ChessPosition(rank, file));
                 if (piece == null) {
                     System.out.print("   ");
                 } else {
                     System.out.print(convertPiece(piece));
                 }
+
             }
             System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.SET_TEXT_COLOR_WHITE);
-            System.out.println(" " + (abs(i) + 1) + " " + EscapeSequences.RESET_BG_COLOR);
+            System.out.println(" " + (i + 1) + " " + EscapeSequences.RESET_BG_COLOR);
         }
-        System.out.print(EscapeSequences.SET_BG_COLOR_BLACK + "   ");
-        for (int i = start; i <= end; i++) {
-            System.out.print(" " + (char) (104 - abs(i)) + " ");
+        renderFileBar(isBlack);
+
+    }
+
+    private static void renderFileBar(boolean isBlack) {
+        System.out.print(EscapeSequences.SET_TEXT_COLOR_WHITE + EscapeSequences.SET_BG_COLOR_BLACK + EscapeSequences.ERASE_SCREEN);
+        System.out.print("   ");
+        if (!isBlack) {
+            for (int i = 7; i >= 0; --i) {
+                System.out.print(" " + (char) (104 - abs(i)) + " ");
+            }
+        } else {
+            for (int i = 0; i < 8; i++) {
+                System.out.print(" " + (char) (104 - abs(i)) + " ");
+            }
         }
         System.out.println("   " + EscapeSequences.RESET_BG_COLOR);
     }

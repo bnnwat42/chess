@@ -140,10 +140,9 @@ public class ChessClient {
             if (response[0].equalsIgnoreCase("observe")) {
                 activeGameId = gameList.get(gameNum - 1).gameID();
                 System.out.println("observing");
-                changeState(STATE.OBSERVING);
                 GameData gameData = null;
                 observerOptions(new String[]{""});
-                renderOptions();
+                changeState(STATE.OBSERVING);
                 return;
             }
             joinGameNoNum(gameNum, game, gameList, response[2]);
@@ -211,9 +210,9 @@ public class ChessClient {
         }
         activeGameId = gameList.get(gameNum - 1).gameID();
         System.out.println("joined");
-        changeState(STATE.IN_GAME);
         GameData gameData = null;
         gameOptions(new String[]{""});
+        changeState(STATE.IN_GAME);
     }
 
     private void create(String[] response) {
@@ -272,10 +271,9 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.loginUser(new UserData(response[1], response[2], null));
-            changeState(STATE.LOGGED_IN);
             userName = response[1];
             authToken = returnedToken;
-            renderOptions();
+            changeState(STATE.LOGGED_IN);
         } catch (RuntimeException e) {
             return;
         }
@@ -288,10 +286,9 @@ public class ChessClient {
         }
         try {
             String returnedToken = facade.registerUser(new UserData(response[1], response[2], response[3]));
-            changeState(STATE.LOGGED_IN);
             userName = response[1];
             authToken = returnedToken;
-            renderOptions();
+            changeState(STATE.LOGGED_IN);
         } catch (RuntimeException e) {
             return;
         }
