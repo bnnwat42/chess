@@ -1,3 +1,5 @@
+package client;
+
 import chess.ChessGame;
 import client.ServerFacade;
 import dataaccess.sql.DatabaseManager;
